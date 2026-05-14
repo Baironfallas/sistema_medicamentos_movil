@@ -8,6 +8,7 @@ import '../../../core/config/api_config.dart';
 import '../models/auth_user.dart';
 import '../models/login_request.dart';
 import '../models/login_response.dart';
+import '../models/logout_request.dart';
 import '../models/register_request.dart';
 import '../models/register_response.dart';
 import 'auth_exception.dart';
@@ -115,8 +116,39 @@ class AuthService {
     }
   }
 
-  Future<void> logout() {
-    return _storage.clearSession();
+  Future<bool> logout() async {
+    var serverLogoutSucceeded = true;
+
+    try {
+      final refreshToken = await _storage.getRefreshToken();
+
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        final response = await _client
+            .post(
+              ApiConfig.endpoint('/auth/logout'),
+              headers: _jsonHeaders,
+              body: jsonEncode(
+                LogoutRequest(refreshToken: refreshToken).toJson(),
+              ),
+            )
+            .timeout(const Duration(seconds: 15));
+
+        serverLogoutSucceeded =
+            response.statusCode >= 200 && response.statusCode < 300;
+      }
+    } on SocketException {
+      serverLogoutSucceeded = false;
+    } on TimeoutException {
+      serverLogoutSucceeded = false;
+    } on FormatException {
+      serverLogoutSucceeded = false;
+    } catch (_) {
+      serverLogoutSucceeded = false;
+    } finally {
+      await _storage.clearSession();
+    }
+
+    return serverLogoutSucceeded;
   }
 
   Future<String?> getAccessToken() {

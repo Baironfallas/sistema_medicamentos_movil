@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../app.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_service.dart';
 import '../../models/auth_user.dart';
 
@@ -16,17 +16,62 @@ class _HomePageState extends State<HomePage> {
   final _authService = AuthService();
 
   late final Future<AuthUser?> _user = _authService.getAuthenticatedUser();
+  bool _isLoggingOut = false;
+
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Cerrar sesión'),
+          content: const Text('¿Deseas salir de tu cuenta?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Salir'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout ?? false) {
+      await _logout();
+    }
+  }
 
   Future<void> _logout() async {
-    await _authService.logout();
+    setState(() => _isLoggingOut = true);
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final serverLogoutSucceeded = await _authService.logout();
 
     if (!mounted) {
       return;
     }
 
-    Navigator.of(
-      context,
-    ).pushNamedAndRemoveUntil(MedicineReminderApp.loginRoute, (_) => false);
+    navigator.pushNamedAndRemoveUntil(
+      MedicineReminderApp.loginRoute,
+      (_) => false,
+    );
+
+    if (!serverLogoutSucceeded) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              'No se pudo cerrar la sesión en el servidor, pero tu sesión local fue finalizada.',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
   }
 
   @override
@@ -37,8 +82,14 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             tooltip: 'Cerrar sesión',
-            onPressed: _logout,
-            icon: const Icon(Icons.logout_outlined),
+            onPressed: _isLoggingOut ? null : _confirmLogout,
+            icon: _isLoggingOut
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.logout_outlined),
           ),
         ],
       ),
