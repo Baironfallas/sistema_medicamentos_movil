@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../main.dart';
+import '../../../../app.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
 import '../../models/login_request.dart';
