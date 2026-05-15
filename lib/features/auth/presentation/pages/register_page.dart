@@ -52,20 +52,42 @@ class _RegisterPageState extends State<RegisterPage> {
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
-      prefixIcon: Icon(prefixIcon, color: const Color(0xFF69818D)),
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFFAFB3B7)),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: const Color(0xFF0D1F23).withOpacity(0.68),
-      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      labelStyle: const TextStyle(color: Color(0xFF69818D)),
-      hintStyle: const TextStyle(color: Color(0xFF69818D), fontSize: 14),
+      contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+      labelStyle: const TextStyle(
+        color: Color(0xFFAFB3B7),
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: const TextStyle(
+        color: Color(0xFF69818D),
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
       border: enabledBorder,
       enabledBorder: enabledBorder,
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF69818D), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF69818D), width: 1.6),
       ),
-      errorStyle: const TextStyle(color: Color(0xFFAFB3B7)),
+      errorStyle: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 12),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFFAFB3B7),
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 
@@ -100,7 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: _identificationController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Identificación',
         hintText: '123456789',
@@ -119,7 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Primer nombre',
         prefixIcon: Icons.person_outline,
@@ -137,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Segundo nombre',
         hintText: 'Opcional',
@@ -157,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstLastNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Primer apellido',
         prefixIcon: Icons.person_outline,
@@ -175,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondLastNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Segundo apellido',
         hintText: 'Opcional',
@@ -197,7 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Correo electrónico',
         hintText: 'juan.perez@gmail.com',
@@ -213,13 +235,13 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.newPassword],
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Contraseña',
         hintText: 'Mínimo 8 caracteres',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: const Color(0xFF5A636A),
+          color: const Color(0xFFAFB3B7),
           tooltip: _obscurePassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
@@ -243,12 +265,12 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscureConfirmPassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _submit(),
-      style: const TextStyle(color: Color(0xFFAFB3B7)),
+      style: const TextStyle(color: Colors.white),
       decoration: _fieldDecoration(
         labelText: 'Confirmar contraseña',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: const Color(0xFF5A636A),
+          color: const Color(0xFFAFB3B7),
           tooltip: _obscureConfirmPassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
@@ -365,11 +387,13 @@ class _RegisterPageState extends State<RegisterPage> {
       subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo',
       visualRefresh: true,
       maxWidth: 720,
-      headerHeight: 84,
-      headerIconSize: 40,
-      headerTitleSpacing: 18,
-      titleFormSpacing: 16,
-      cardPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      headerHeight: 68,
+      headerIconSize: 32,
+      headerTitleSpacing: 14,
+      titleFormSpacing: 14,
+      cardPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      headerLabel: 'Registro seguro para tu salud',
+      scrollBottomPadding: 52,
       darkDecorativeBackground: true,
       child: Form(
         key: _formKey,
@@ -384,6 +408,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   AuthMessage(message: _message!, isError: _isErrorMessage),
                   const SizedBox(height: 14),
                 ],
+                _sectionTitle('Datos personales'),
                 _identificationField(),
                 const SizedBox(height: _fieldSpacing),
                 _responsiveFieldRow(
@@ -397,7 +422,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   first: _firstLastNameField(),
                   second: _secondLastNameField(),
                 ),
-                const SizedBox(height: _fieldSpacing),
+                const SizedBox(height: 14),
+                _sectionTitle('Datos de acceso'),
                 _emailField(),
                 const SizedBox(height: _fieldSpacing),
                 _responsiveFieldRow(
@@ -412,10 +438,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: _submit,
                   useGradient: true,
                   gradientColors: const [
-                    Color(0xFF69818D),
-                    Color(0xFFAFB3B7),
+                    Color(0xFF3D6B7A),
+                    Color(0xFF89A8B2),
                   ],
-                  textColor: const Color(0xFF0D1F23),
+                  textColor: Colors.white,
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -424,13 +450,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text(
                       '¿Ya tienes cuenta?',
-                      style: TextStyle(color: Color(0xFF69818D)),
+                      style: TextStyle(color: Color(0xFFAFB3B7)),
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFAFB3B7),
+                        foregroundColor: const Color(0xFF80CBC4),
                         textStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       onPressed: _isLoading

@@ -22,6 +22,7 @@ class AuthFormLayout extends StatelessWidget {
     this.cardPadding,
     this.darkDecorativeBackground = false,
     this.showTitle = true,
+    this.scrollBottomPadding,
   });
 
   final String title;
@@ -39,11 +40,15 @@ class AuthFormLayout extends StatelessWidget {
   final EdgeInsetsGeometry? cardPadding;
   final bool darkDecorativeBackground;
   final bool showTitle;
+  final double? scrollBottomPadding;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final bottomPadding = visualRefresh ? 32.0 : 28.0;
+    final bottomSafeArea = MediaQuery.of(context).viewPadding.bottom;
+    final bottomPadding =
+        (scrollBottomPadding ?? (visualRefresh ? 32.0 : 28.0)) +
+        bottomSafeArea;
     final headerRadius = visualRefresh
         ? const BorderRadius.only(
             bottomLeft: Radius.circular(24),
@@ -85,6 +90,17 @@ class AuthFormLayout extends StatelessWidget {
                                 color: darkDecorativeBackground
                                     ? const Color(0xFF0D1F23).withOpacity(0.72)
                                     : AppColors.primary.withValues(alpha: 0.1),
+                                gradient:
+                                    !darkDecorativeBackground && visualRefresh
+                                    ? const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xFF2563EB),
+                                          Color(0xFF14B8A6),
+                                        ],
+                                      )
+                                    : null,
                                 borderRadius: darkDecorativeBackground
                                     ? null
                                     : headerRadius,
@@ -113,6 +129,8 @@ class AuthFormLayout extends StatelessWidget {
                                       Icons.medication_liquid_outlined,
                                       color: darkDecorativeBackground
                                           ? const Color(0xFFAFB3B7)
+                                          : visualRefresh
+                                          ? Colors.white
                                           : AppColors.primary,
                                       size: headerIconSize ??
                                           (visualRefresh ? 44 : 34),
@@ -125,7 +143,7 @@ class AuthFormLayout extends StatelessWidget {
                                           Icons.medication_liquid_outlined,
                                           color: darkDecorativeBackground
                                               ? const Color(0xFFAFB3B7)
-                                              : AppColors.primary,
+                                              : Colors.white,
                                           size: headerIconSize ??
                                               (visualRefresh ? 38 : 34),
                                         ),
@@ -136,9 +154,18 @@ class AuthFormLayout extends StatelessWidget {
                                           style: TextStyle(
                                             color: darkDecorativeBackground
                                                 ? Colors.white.withOpacity(0.75)
-                                                : Colors.blue.shade700,
+                                                : Colors.white,
                                             fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.w800,
+                                            shadows: !darkDecorativeBackground
+                                                ? const [
+                                                    Shadow(
+                                                      color: Color(0x660F172A),
+                                                      blurRadius: 6,
+                                                      offset: Offset(0, 1),
+                                                    ),
+                                                  ]
+                                                : null,
                                           ),
                                         ),
                                       ],
@@ -155,7 +182,7 @@ class AuthFormLayout extends StatelessWidget {
                           style: textTheme.headlineSmall?.copyWith(
                             color: darkDecorativeBackground
                                 ? Colors.white
-                                : AppColors.textPrimary,
+                                : const Color(0xFF0F172A),
                             fontSize: darkDecorativeBackground
                                 ? 26
                                 : visualRefresh
@@ -180,7 +207,7 @@ class AuthFormLayout extends StatelessWidget {
                                 : darkDecorativeBackground
                                 ? const Color(0xFFAFB3B7)
                                 : visualRefresh
-                                ? Colors.grey.shade800
+                                ? const Color(0xFF0F172A)
                                 : AppColors.textPrimary,
                             fontSize: welcomeText != null
                                 ? 18
@@ -201,11 +228,11 @@ class AuthFormLayout extends StatelessWidget {
                           color: visualRefresh
                               ? darkDecorativeBackground
                                     ? Colors.white.withOpacity(0.70)
-                                    : Colors.grey.shade500
+                                    : const Color(0xFF334155)
                               : AppColors.textSecondary,
                           fontSize: visualRefresh ? 14 : null,
                           fontWeight: visualRefresh
-                              ? FontWeight.w400
+                              ? FontWeight.w500
                               : FontWeight.normal,
                           height: 1.4,
                         ),
@@ -218,9 +245,9 @@ class AuthFormLayout extends StatelessWidget {
                           style: textTheme.bodySmall?.copyWith(
                             color: darkDecorativeBackground
                                 ? const Color(0xFF80CBC4)
-                                : Colors.grey.shade500,
+                                : const Color(0xFF475569),
                             fontSize: 13,
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
                             height: 1.35,
                           ),
                         ),
@@ -248,6 +275,11 @@ class AuthFormLayout extends StatelessWidget {
                                             color: const Color(
                                               0xFFAFB3B7,
                                             ).withOpacity(0.14),
+                                            width: 1,
+                                          )
+                                        : visualRefresh
+                                        ? Border.all(
+                                            color: const Color(0xFFBFDBFE),
                                             width: 1,
                                           )
                                         : null,
@@ -327,11 +359,15 @@ class AuthFormLayout extends StatelessWidget {
             )
           : visualRefresh
           ? Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.blue.shade50, Colors.white],
+                  colors: [
+                    Color(0xFFF5F9FF),
+                    Color(0xFFDBEAFE),
+                    Colors.white,
+                  ],
                 ),
               ),
               child: content,
