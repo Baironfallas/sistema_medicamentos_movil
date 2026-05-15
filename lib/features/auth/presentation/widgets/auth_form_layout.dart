@@ -88,7 +88,7 @@ class AuthFormLayout extends StatelessWidget {
                                   headerHeight ?? (visualRefresh ? 110 : 64),
                               decoration: BoxDecoration(
                                 color: darkDecorativeBackground
-                                    ? const Color(0xFF0D1F23).withOpacity(0.72)
+                                    ? const Color(0xFF06141B).withOpacity(0.74)
                                     : AppColors.primary.withValues(alpha: 0.1),
                                 gradient:
                                     !darkDecorativeBackground && visualRefresh
@@ -96,8 +96,8 @@ class AuthFormLayout extends StatelessWidget {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          Color(0xFF2563EB),
-                                          Color(0xFF14B8A6),
+                                          Color(0xFF253745),
+                                          Color(0xFF4A5C6A),
                                         ],
                                       )
                                     : null,
@@ -108,7 +108,7 @@ class AuthFormLayout extends StatelessWidget {
                                     ? Border(
                                         bottom: BorderSide(
                                           color: const Color(
-                                            0xFF69818D,
+                                            0xFF4A5C6A,
                                           ).withOpacity(0.3),
                                           width: 1,
                                         ),
@@ -117,7 +117,9 @@ class AuthFormLayout extends StatelessWidget {
                                 boxShadow: visualRefresh
                                     ? [
                                         BoxShadow(
-                                          color: Colors.blue.withOpacity(0.15),
+                                          color: const Color(
+                                            0xFF4A5C6A,
+                                          ).withOpacity(0.18),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),
@@ -128,7 +130,7 @@ class AuthFormLayout extends StatelessWidget {
                                   ? Icon(
                                       Icons.medication_liquid_outlined,
                                       color: darkDecorativeBackground
-                                          ? const Color(0xFFAFB3B7)
+                                          ? const Color(0xFFCCD0CF)
                                           : visualRefresh
                                           ? Colors.white
                                           : AppColors.primary,
@@ -142,7 +144,7 @@ class AuthFormLayout extends StatelessWidget {
                                         Icon(
                                           Icons.medication_liquid_outlined,
                                           color: darkDecorativeBackground
-                                              ? const Color(0xFFAFB3B7)
+                                              ? const Color(0xFFCCD0CF)
                                               : Colors.white,
                                           size: headerIconSize ??
                                               (visualRefresh ? 38 : 34),
@@ -153,7 +155,7 @@ class AuthFormLayout extends StatelessWidget {
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: darkDecorativeBackground
-                                                ? Colors.white.withOpacity(0.75)
+                                                ? const Color(0xFFCCD0CF)
                                                 : Colors.white,
                                             fontSize: 13,
                                             fontWeight: FontWeight.w800,
@@ -181,7 +183,7 @@ class AuthFormLayout extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: textTheme.headlineSmall?.copyWith(
                             color: darkDecorativeBackground
-                                ? Colors.white
+                                ? const Color(0xFFCCD0CF)
                                 : const Color(0xFF0F172A),
                             fontSize: darkDecorativeBackground
                                 ? 26
@@ -202,10 +204,10 @@ class AuthFormLayout extends StatelessWidget {
                           style: textTheme.headlineSmall?.copyWith(
                             color: welcomeText != null
                                 ? darkDecorativeBackground
-                                      ? const Color(0xFFAFB3B7)
-                                      : Colors.blue.shade600
+                                      ? const Color(0xFF9BA8AB)
+                                      : const Color(0xFF4A5C6A)
                                 : darkDecorativeBackground
-                                ? const Color(0xFFAFB3B7)
+                                ? const Color(0xFFCCD0CF)
                                 : visualRefresh
                                 ? const Color(0xFF0F172A)
                                 : AppColors.textPrimary,
@@ -227,7 +229,7 @@ class AuthFormLayout extends StatelessWidget {
                         style: textTheme.bodyMedium?.copyWith(
                           color: visualRefresh
                               ? darkDecorativeBackground
-                                    ? Colors.white.withOpacity(0.70)
+                                    ? const Color(0xFF9BA8AB)
                                     : const Color(0xFF334155)
                               : AppColors.textSecondary,
                           fontSize: visualRefresh ? 14 : null,
@@ -244,7 +246,7 @@ class AuthFormLayout extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: textTheme.bodySmall?.copyWith(
                             color: darkDecorativeBackground
-                                ? const Color(0xFF80CBC4)
+                                ? const Color(0xFFCCD0CF)
                                 : const Color(0xFF475569),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -266,20 +268,20 @@ class AuthFormLayout extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: darkDecorativeBackground
                                         ? const Color(
-                                            0xFF132E35,
-                                          ).withOpacity(0.72)
+                                            0xFF11212D,
+                                          ).withOpacity(0.76)
                                         : Colors.white,
                                     borderRadius: BorderRadius.circular(20),
                                     border: darkDecorativeBackground
                                         ? Border.all(
                                             color: const Color(
-                                              0xFFAFB3B7,
-                                            ).withOpacity(0.14),
+                                              0xFFCCD0CF,
+                                            ).withOpacity(0.13),
                                             width: 1,
                                           )
                                         : visualRefresh
                                         ? Border.all(
-                                            color: const Color(0xFFBFDBFE),
+                                            color: const Color(0xFF9BA8AB),
                                             width: 1,
                                           )
                                         : null,
@@ -342,10 +344,10 @@ class AuthFormLayout extends StatelessWidget {
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFF0D1F23),
-                        Color(0xFF132E35),
-                        Color(0xFF2D4A53),
-                        Color(0xFF69818D),
+                        Color(0xFF06141B),
+                        Color(0xFF11212D),
+                        Color(0xFF253745),
+                        Color(0xFF4A5C6A),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -364,9 +366,9 @@ class AuthFormLayout extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFF5F9FF),
-                    Color(0xFFDBEAFE),
-                    Colors.white,
+                    Color(0xFFCCD0CF),
+                    Color(0xFF9BA8AB),
+                    Color(0xFF4A5C6A),
                   ],
                 ),
               ),
@@ -390,7 +392,7 @@ class _AmbientBackground extends StatelessWidget {
           child: _AmbientGlow(
             width: 320,
             height: 280,
-            color: Color(0xFF69818D),
+            color: Color(0xFF4A5C6A),
             opacity: 0.20,
           ),
         ),
@@ -400,7 +402,7 @@ class _AmbientBackground extends StatelessWidget {
           child: _AmbientGlow(
             width: 360,
             height: 300,
-            color: Color(0xFF2D4A53),
+            color: Color(0xFF253745),
             opacity: 0.22,
           ),
         ),
@@ -410,7 +412,7 @@ class _AmbientBackground extends StatelessWidget {
           child: _AmbientGlow(
             width: 420,
             height: 340,
-            color: Color(0xFF69818D),
+            color: Color(0xFF4A5C6A),
             opacity: 0.16,
           ),
         ),
@@ -474,10 +476,10 @@ class _AmbientWash extends StatelessWidget {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              const Color(0xFF2D4A53).withOpacity(0.0),
-              const Color(0xFF2D4A53).withOpacity(0.18),
-              const Color(0xFF69818D).withOpacity(0.10),
-              const Color(0xFF2D4A53).withOpacity(0.0),
+              const Color(0xFF253745).withOpacity(0.0),
+              const Color(0xFF253745).withOpacity(0.18),
+              const Color(0xFF4A5C6A).withOpacity(0.12),
+              const Color(0xFF253745).withOpacity(0.0),
             ],
           ),
         ),

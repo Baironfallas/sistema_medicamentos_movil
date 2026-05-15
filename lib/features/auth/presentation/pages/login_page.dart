@@ -39,23 +39,23 @@ class _LoginPageState extends State<LoginPage> {
       labelText: labelText,
       hintText: hintText,
       filled: true,
-      fillColor: const Color(0xFF0D1F23).withOpacity(0.68),
+      fillColor: const Color(0xFF06141B).withOpacity(0.70),
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF2D4A53)),
+        borderSide: const BorderSide(color: Color(0xFF253745)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF2D4A53), width: 1.0),
+        borderSide: const BorderSide(color: Color(0xFF253745), width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF69818D), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.5),
       ),
-      labelStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
-      prefixIcon: Icon(prefixIcon, color: Colors.white.withOpacity(0.60)),
+      labelStyle: const TextStyle(color: Color(0xFF9BA8AB)),
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFF9BA8AB)),
       suffixIcon: suffixIcon,
-      hintStyle: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+      hintStyle: const TextStyle(color: Color(0xFF9BA8AB), fontSize: 14),
       contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
     );
   }
@@ -144,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Color(0xFFCCD0CF)),
               decoration: _fieldDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               onFieldSubmitted: (_) => _submit(),
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Color(0xFFCCD0CF)),
               decoration: _fieldDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',
@@ -175,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
-                    color: Colors.white.withOpacity(0.60),
+                    color: const Color(0xFF9BA8AB),
                   ),
                 ),
               ),
@@ -187,8 +187,8 @@ class _LoginPageState extends State<LoginPage> {
               isLoading: _isLoading,
               onPressed: _submit,
               useGradient: true,
-              gradientColors: const [Color(0xFF3D6B7A), Color(0xFF89A8B2)],
-              textColor: Colors.white,
+              gradientColors: const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
+              textColor: const Color(0xFF06141B),
             ),
             const SizedBox(height: 16),
             Row(
@@ -197,13 +197,13 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   '¿No tienes cuenta?',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.60),
+                    color: const Color(0xFF9BA8AB),
                     fontSize: 14,
                   ),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF80CBC4),
+                    foregroundColor: const Color(0xFFCCD0CF),
                     textStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

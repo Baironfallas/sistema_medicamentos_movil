@@ -78,16 +78,16 @@ class _HomePageState extends State<HomePage> {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom + 40;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1F23),
+      backgroundColor: const Color(0xFF06141B),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1F23),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF06141B),
+        foregroundColor: const Color(0xFFCCD0CF),
         elevation: 0,
         titleSpacing: 20,
         title: const Text(
           'Sistema de Medicamentos',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFFCCD0CF),
             fontSize: 19,
             fontWeight: FontWeight.w700,
           ),
@@ -102,10 +102,10 @@ class _HomePageState extends State<HomePage> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFAFB3B7),
+                      color: Color(0xFFCCD0CF),
                     ),
                   )
-                : const Icon(Icons.logout_outlined, color: Color(0xFFAFB3B7)),
+                : const Icon(Icons.logout_outlined, color: Color(0xFFCCD0CF)),
           ),
           const SizedBox(width: 8),
         ],
@@ -120,10 +120,10 @@ class _HomePageState extends State<HomePage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF0D1F23),
-                  Color(0xFF132E35),
-                  Color(0xFF2D4A53),
-                  Color(0xFF69818D),
+                  Color(0xFF06141B),
+                  Color(0xFF11212D),
+                  Color(0xFF253745),
+                  Color(0xFF4A5C6A),
                 ],
                 stops: [0.0, 0.38, 0.72, 1.0],
               ),
@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage> {
             right: -80,
             child: _AmbientShape(
               size: 220,
-              color: Color(0xFF69818D),
+              color: Color(0xFF4A5C6A),
               opacity: 0.18,
             ),
           ),
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
             left: -90,
             child: _AmbientShape(
               size: 260,
-              color: Color(0xFF2D4A53),
+              color: Color(0xFF253745),
               opacity: 0.30,
             ),
           ),
@@ -173,12 +173,12 @@ class _HomePageState extends State<HomePage> {
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(
-                                  0xFF132E35,
+                                  0xFF11212D,
                                 ).withOpacity(0.78),
                                 borderRadius: BorderRadius.circular(28),
                                 border: Border.all(
                                   color: const Color(
-                                    0xFFAFB3B7,
+                                    0xFFCCD0CF,
                                   ).withOpacity(0.12),
                                 ),
                                 boxShadow: [
@@ -200,15 +200,15 @@ class _HomePageState extends State<HomePage> {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          Color(0xFF3D6B7A),
-                                          Color(0xFF89A8B2),
+                                          Color(0xFF4A5C6A),
+                                          Color(0xFF9BA8AB),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(26),
                                       boxShadow: [
                                         BoxShadow(
                                           color: const Color(
-                                            0xFF69818D,
+                                            0xFF4A5C6A,
                                           ).withOpacity(0.28),
                                           blurRadius: 24,
                                           offset: const Offset(0, 10),
@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: const Icon(
                                       Icons.medication_liquid_outlined,
-                                      color: Colors.white,
+                                      color: Color(0xFFCCD0CF),
                                       size: 40,
                                     ),
                                   ),
@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                         .textTheme
                                         .headlineSmall
                                         ?.copyWith(
-                                          color: Colors.white,
+                                          color: Color(0xFFCCD0CF),
                                           fontWeight: FontWeight.w800,
                                           height: 1.18,
                                         ),
@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context).textTheme.bodyLarge
                                         ?.copyWith(
-                                          color: const Color(0xFFAFB3B7),
+                                          color: const Color(0xFF9BA8AB),
                                           fontWeight: FontWeight.w500,
                                           height: 1.45,
                                         ),
@@ -256,12 +256,12 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: const Color(
-                                        0xFF0D1F23,
+                                        0xFF06141B,
                                       ).withOpacity(0.56),
                                       borderRadius: BorderRadius.circular(18),
                                       border: Border.all(
                                         color: const Color(
-                                          0xFF2D4A53,
+                                          0xFF253745,
                                         ).withOpacity(0.9),
                                       ),
                                     ),
@@ -269,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         Icon(
                                           Icons.notifications_active_outlined,
-                                          color: Color(0xFF80CBC4),
+                                          color: Color(0xFFCCD0CF),
                                           size: 24,
                                         ),
                                         SizedBox(width: 12),
@@ -277,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                                           child: Text(
                                             'Tu espacio de salud está listo para usar.',
                                             style: TextStyle(
-                                              color: Color(0xFFAFB3B7),
+                                              color: Color(0xFFCCD0CF),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
                                               height: 1.35,

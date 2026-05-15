@@ -26,7 +26,8 @@ class PrimaryLoadingButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors:
-                gradientColors ?? [Colors.blue.shade700, Colors.blue.shade400],
+                gradientColors ??
+                const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
