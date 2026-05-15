@@ -7,12 +7,16 @@ class PrimaryLoadingButton extends StatelessWidget {
     required this.isLoading,
     required this.onPressed,
     this.useGradient = false,
+    this.gradientColors,
+    this.textColor = Colors.white,
   });
 
   final String label;
   final bool isLoading;
   final VoidCallback? onPressed;
   final bool useGradient;
+  final List<Color>? gradientColors;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,8 @@ class PrimaryLoadingButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue.shade700, Colors.blue.shade400],
+            colors:
+                gradientColors ?? [Colors.blue.shade700, Colors.blue.shade400],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
@@ -51,20 +56,20 @@ class PrimaryLoadingButton extends StatelessWidget {
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       key: ValueKey('loading'),
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.4,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                     )
                   : Text(
                       label,
                       key: const ValueKey('label'),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: textColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

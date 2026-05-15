@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
 import '../../models/register_request.dart';
@@ -47,24 +46,26 @@ class _RegisterPageState extends State<RegisterPage> {
     final borderRadius = BorderRadius.circular(12);
     final enabledBorder = OutlineInputBorder(
       borderRadius: borderRadius,
-      borderSide: BorderSide(color: Colors.blue.shade200),
+      borderSide: const BorderSide(color: Color(0xFF2D4A53), width: 1.0),
     );
 
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
-      prefixIcon: Icon(prefixIcon, color: Colors.blue.shade400),
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFF69818D)),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: Colors.blue.shade50,
+      fillColor: const Color(0xFF0D1F23).withOpacity(0.68),
       contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+      labelStyle: const TextStyle(color: Color(0xFF69818D)),
+      hintStyle: const TextStyle(color: Color(0xFF69818D), fontSize: 14),
       border: enabledBorder,
       enabledBorder: enabledBorder,
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.blue.shade600, width: 1.8),
+        borderSide: const BorderSide(color: Color(0xFF69818D), width: 1.5),
       ),
+      errorStyle: const TextStyle(color: Color(0xFFAFB3B7)),
     );
   }
 
@@ -99,6 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: _identificationController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Identificación',
         hintText: '123456789',
@@ -117,6 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstNameController,
       textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Primer nombre',
         prefixIcon: Icons.person_outline,
@@ -134,6 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondNameController,
       textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Segundo nombre',
         hintText: 'Opcional',
@@ -153,6 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstLastNameController,
       textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Primer apellido',
         prefixIcon: Icons.person_outline,
@@ -170,6 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondLastNameController,
       textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Segundo apellido',
         hintText: 'Opcional',
@@ -191,6 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Correo electrónico',
         hintText: 'juan.perez@gmail.com',
@@ -206,12 +213,13 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.newPassword],
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Contraseña',
         hintText: 'Mínimo 8 caracteres',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: Colors.blue.shade400,
+          color: const Color(0xFF5A636A),
           tooltip: _obscurePassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
@@ -235,11 +243,12 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscureConfirmPassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _submit(),
+      style: const TextStyle(color: Color(0xFFAFB3B7)),
       decoration: _fieldDecoration(
         labelText: 'Confirmar contraseña',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: Colors.blue.shade400,
+          color: const Color(0xFF5A636A),
           tooltip: _obscureConfirmPassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
@@ -361,6 +370,7 @@ class _RegisterPageState extends State<RegisterPage> {
       headerTitleSpacing: 18,
       titleFormSpacing: 16,
       cardPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      darkDecorativeBackground: true,
       child: Form(
         key: _formKey,
         child: LayoutBuilder(
@@ -401,6 +411,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   isLoading: _isLoading,
                   onPressed: _submit,
                   useGradient: true,
+                  gradientColors: const [
+                    Color(0xFF69818D),
+                    Color(0xFFAFB3B7),
+                  ],
+                  textColor: const Color(0xFF0D1F23),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -409,9 +424,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text(
                       '¿Ya tienes cuenta?',
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: Color(0xFF69818D)),
                     ),
                     TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFAFB3B7),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       onPressed: _isLoading
                           ? null
                           : () {

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -18,6 +20,7 @@ class AuthFormLayout extends StatelessWidget {
     this.headerTitleSpacing,
     this.titleFormSpacing,
     this.cardPadding,
+    this.darkDecorativeBackground = false,
   });
 
   final String title;
@@ -33,12 +36,18 @@ class AuthFormLayout extends StatelessWidget {
   final double? headerTitleSpacing;
   final double? titleFormSpacing;
   final EdgeInsetsGeometry? cardPadding;
+  final bool darkDecorativeBackground;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
     final bottomPadding = visualRefresh ? 32.0 : 28.0;
+    final headerRadius = visualRefresh
+        ? const BorderRadius.only(
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
+          )
+        : BorderRadius.circular(20);
 
     final content = SafeArea(
       child: LayoutBuilder(
@@ -60,55 +69,80 @@ class AuthFormLayout extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Center(
-                        child: Container(
-                          width: visualRefresh ? double.infinity : 64,
-                          height: headerHeight ?? (visualRefresh ? 110 : 64),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: visualRefresh
-                                ? const BorderRadius.only(
-                                    bottomLeft: Radius.circular(24),
-                                    bottomRight: Radius.circular(24),
-                                  )
-                                : BorderRadius.circular(20),
-                            boxShadow: visualRefresh
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.blue.withOpacity(0.15),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: headerLabel == null
-                              ? Icon(
-                                  Icons.medication_liquid_outlined,
-                                  color: AppColors.primary,
-                                  size: headerIconSize ??
-                                      (visualRefresh ? 44 : 34),
-                                )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
+                        child: ClipRRect(
+                          borderRadius: headerRadius,
+                          child: BackdropFilter(
+                            filter: darkDecorativeBackground
+                                ? ImageFilter.blur(sigmaX: 10, sigmaY: 10)
+                                : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                            child: Container(
+                              width: visualRefresh ? double.infinity : 64,
+                              height:
+                                  headerHeight ?? (visualRefresh ? 110 : 64),
+                              decoration: BoxDecoration(
+                                color: darkDecorativeBackground
+                                    ? const Color(0xFF0D1F23).withOpacity(0.72)
+                                    : AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: darkDecorativeBackground
+                                    ? null
+                                    : headerRadius,
+                                border: darkDecorativeBackground
+                                    ? Border(
+                                        bottom: BorderSide(
+                                          color: const Color(
+                                            0xFF69818D,
+                                          ).withOpacity(0.3),
+                                          width: 1,
+                                        ),
+                                      )
+                                    : null,
+                                boxShadow: visualRefresh
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.blue.withOpacity(0.15),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: headerLabel == null
+                                  ? Icon(
                                       Icons.medication_liquid_outlined,
-                                      color: AppColors.primary,
+                                      color: darkDecorativeBackground
+                                          ? const Color(0xFFAFB3B7)
+                                          : AppColors.primary,
                                       size: headerIconSize ??
-                                          (visualRefresh ? 38 : 34),
+                                          (visualRefresh ? 44 : 34),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.medication_liquid_outlined,
+                                          color: darkDecorativeBackground
+                                              ? const Color(0xFFAFB3B7)
+                                              : AppColors.primary,
+                                          size: headerIconSize ??
+                                              (visualRefresh ? 38 : 34),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          headerLabel!,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: darkDecorativeBackground
+                                                ? Colors.white.withOpacity(0.75)
+                                                : Colors.blue.shade700,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      headerLabel!,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.blue.shade700,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(height: headerTitleSpacing ?? 28),
@@ -117,9 +151,17 @@ class AuthFormLayout extends StatelessWidget {
                           welcomeText!,
                           textAlign: TextAlign.center,
                           style: textTheme.headlineSmall?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontSize: visualRefresh ? 28 : null,
-                            fontWeight: FontWeight.w800,
+                            color: darkDecorativeBackground
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                            fontSize: darkDecorativeBackground
+                                ? 26
+                                : visualRefresh
+                                ? 28
+                                : null,
+                            fontWeight: darkDecorativeBackground
+                                ? FontWeight.w700
+                                : FontWeight.w800,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -129,7 +171,11 @@ class AuthFormLayout extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: textTheme.headlineSmall?.copyWith(
                           color: welcomeText != null
-                              ? Colors.blue.shade600
+                              ? darkDecorativeBackground
+                                    ? const Color(0xFFAFB3B7)
+                                    : Colors.blue.shade600
+                              : darkDecorativeBackground
+                              ? const Color(0xFFAFB3B7)
                               : visualRefresh
                               ? Colors.grey.shade800
                               : AppColors.textPrimary,
@@ -149,7 +195,9 @@ class AuthFormLayout extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: textTheme.bodyMedium?.copyWith(
                           color: visualRefresh
-                              ? Colors.grey.shade500
+                              ? darkDecorativeBackground
+                                    ? Colors.white.withOpacity(0.70)
+                                    : Colors.grey.shade500
                               : AppColors.textSecondary,
                           fontSize: visualRefresh ? 14 : null,
                           fontWeight: visualRefresh
@@ -164,7 +212,9 @@ class AuthFormLayout extends StatelessWidget {
                           supportingText!,
                           textAlign: TextAlign.center,
                           style: textTheme.bodySmall?.copyWith(
-                            color: Colors.grey.shade500,
+                            color: darkDecorativeBackground
+                                ? const Color(0xFF80CBC4)
+                                : Colors.grey.shade500,
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
                             height: 1.35,
@@ -175,26 +225,54 @@ class AuthFormLayout extends StatelessWidget {
                         height: titleFormSpacing ?? (visualRefresh ? 24 : 28),
                       ),
                       visualRefresh
-                          ? Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
-                                    blurRadius: 16,
-                                    spreadRadius: 0,
-                                    offset: const Offset(0, 6),
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: BackdropFilter(
+                                filter: darkDecorativeBackground
+                                    ? ImageFilter.blur(sigmaX: 18, sigmaY: 18)
+                                    : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: darkDecorativeBackground
+                                        ? const Color(
+                                            0xFF132E35,
+                                          ).withOpacity(0.72)
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: darkDecorativeBackground
+                                        ? Border.all(
+                                            color: const Color(
+                                              0xFFAFB3B7,
+                                            ).withOpacity(0.14),
+                                            width: 1,
+                                          )
+                                        : null,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: darkDecorativeBackground
+                                            ? Colors.black.withOpacity(0.38)
+                                            : Colors.black.withValues(
+                                                alpha: 0.08,
+                                              ),
+                                        blurRadius: darkDecorativeBackground
+                                            ? 36
+                                            : 16,
+                                        spreadRadius: 0,
+                                        offset: darkDecorativeBackground
+                                            ? const Offset(0, 16)
+                                            : const Offset(0, 6),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                  padding:
+                                      cardPadding ??
+                                      const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 20,
+                                      ),
+                                  child: child,
+                                ),
                               ),
-                              padding:
-                                  cardPadding ??
-                                  const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 20,
-                                  ),
-                              child: child,
                             )
                           : Card(
                               elevation: 0,
@@ -219,7 +297,31 @@ class AuthFormLayout extends StatelessWidget {
     );
 
     return Scaffold(
-      body: visualRefresh
+      body: darkDecorativeBackground
+          ? Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF0D1F23),
+                        Color(0xFF132E35),
+                        Color(0xFF2D4A53),
+                        Color(0xFF69818D),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.0, 0.35, 0.65, 1.0],
+                    ),
+                  ),
+                ),
+                const IgnorePointer(child: _AmbientBackground()),
+                content,
+              ],
+            )
+          : visualRefresh
           ? Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -231,6 +333,115 @@ class AuthFormLayout extends StatelessWidget {
               child: content,
             )
           : content,
+    );
+  }
+}
+
+class _AmbientBackground extends StatelessWidget {
+  const _AmbientBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: const [
+        Positioned(
+          top: -120,
+          right: -90,
+          child: _AmbientGlow(
+            width: 320,
+            height: 280,
+            color: Color(0xFF69818D),
+            opacity: 0.20,
+          ),
+        ),
+        Positioned(
+          top: 210,
+          left: -150,
+          child: _AmbientGlow(
+            width: 360,
+            height: 300,
+            color: Color(0xFF2D4A53),
+            opacity: 0.22,
+          ),
+        ),
+        Positioned(
+          bottom: -130,
+          right: -120,
+          child: _AmbientGlow(
+            width: 420,
+            height: 340,
+            color: Color(0xFF69818D),
+            opacity: 0.16,
+          ),
+        ),
+        Positioned(
+          bottom: 120,
+          left: 40,
+          right: 40,
+          child: _AmbientWash(),
+        ),
+      ],
+    );
+  }
+}
+
+class _AmbientGlow extends StatelessWidget {
+  const _AmbientGlow({
+    required this.width,
+    required this.height,
+    required this.color,
+    required this.opacity,
+  });
+
+  final double width;
+  final double height;
+  final Color color;
+  final double opacity;
+
+  @override
+  Widget build(BuildContext context) {
+    return ImageFiltered(
+      imageFilter: ImageFilter.blur(sigmaX: 54, sigmaY: 54),
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              color.withOpacity(opacity),
+              color.withOpacity(opacity * 0.42),
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.48, 1.0],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AmbientWash extends StatelessWidget {
+  const _AmbientWash();
+
+  @override
+  Widget build(BuildContext context) {
+    return ImageFiltered(
+      imageFilter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
+      child: Container(
+        height: 180,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              const Color(0xFF2D4A53).withOpacity(0.0),
+              const Color(0xFF2D4A53).withOpacity(0.18),
+              const Color(0xFF69818D).withOpacity(0.10),
+              const Color(0xFF2D4A53).withOpacity(0.0),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -27,6 +27,39 @@ class _LoginPageState extends State<LoginPage> {
   String? _message;
   bool _isErrorMessage = true;
 
+  InputDecoration _fieldDecoration({
+    required String labelText,
+    required String hintText,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final borderRadius = BorderRadius.circular(12);
+
+    return InputDecoration(
+      labelText: labelText,
+      hintText: hintText,
+      filled: true,
+      fillColor: const Color(0xFF0D1F23).withOpacity(0.68),
+      border: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF2D4A53)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF2D4A53), width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF69818D), width: 1.5),
+      ),
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
+      prefixIcon: Icon(prefixIcon, color: Colors.white.withOpacity(0.60)),
+      suffixIcon: suffixIcon,
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+    );
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -95,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
       headerIconSize: 36,
       headerTitleSpacing: 22,
       titleFormSpacing: 32,
+      darkDecorativeBackground: true,
       child: Form(
         key: _formKey,
         child: Column(
@@ -109,35 +143,11 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              decoration: _fieldDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
-                filled: true,
-                fillColor: Colors.blue.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.blue.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.blue.shade200),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.blue.shade600,
-                    width: 1.8,
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.email_outlined,
-                  color: Colors.blue.shade400,
-                ),
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 15,
-                  horizontal: 16,
-                ),
+                prefixIcon: Icons.email_outlined,
               ),
               validator: AuthValidators.email,
             ),
@@ -148,30 +158,11 @@ class _LoginPageState extends State<LoginPage> {
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               onFieldSubmitted: (_) => _submit(),
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              decoration: _fieldDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',
-                filled: true,
-                fillColor: Colors.blue.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.blue.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.blue.shade200),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.blue.shade600,
-                    width: 1.8,
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.lock_outline,
-                  color: Colors.blue.shade400,
-                ),
+                prefixIcon: Icons.lock_outline,
                 suffixIcon: IconButton(
                   tooltip: _obscurePassword
                       ? 'Mostrar contraseña'
@@ -183,15 +174,8 @@ class _LoginPageState extends State<LoginPage> {
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
-                    color: _obscurePassword
-                        ? Colors.grey.shade400
-                        : Colors.blue.shade500,
+                    color: Colors.white.withOpacity(0.60),
                   ),
-                ),
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 15,
-                  horizontal: 16,
                 ),
               ),
               validator: AuthValidators.password,
@@ -202,6 +186,8 @@ class _LoginPageState extends State<LoginPage> {
               isLoading: _isLoading,
               onPressed: _submit,
               useGradient: true,
+              gradientColors: const [Color(0xFF3D6B7A), Color(0xFF89A8B2)],
+              textColor: Colors.white,
             ),
             const SizedBox(height: 16),
             Row(
@@ -209,14 +195,17 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Text(
                   '¿No tienes cuenta?',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.60),
+                    fontSize: 14,
+                  ),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.blue.shade600,
+                    foregroundColor: const Color(0xFF80CBC4),
                     textStyle: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   onPressed: _isLoading
