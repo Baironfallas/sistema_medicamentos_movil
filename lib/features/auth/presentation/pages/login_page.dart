@@ -119,16 +119,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return AuthFormLayout(
       title: 'Iniciar sesión',
-      subtitle: 'Accede para gestionar tus medicamentos y recordatorios',
+      subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo.',
       welcomeText: 'Bienvenido de nuevo',
-      supportingText: 'Tu tratamiento organizado, siempre a tiempo.',
+      supportingText: 'Cuida tu salud de forma simple y segura.',
       headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
       headerHeight: 102,
       headerIconSize: 36,
       headerTitleSpacing: 22,
-      titleFormSpacing: 32,
+      titleFormSpacing: 28,
       darkDecorativeBackground: true,
+      showTitle: false,
       child: Form(
         key: _formKey,
         child: Column(

@@ -21,6 +21,7 @@ class AuthFormLayout extends StatelessWidget {
     this.titleFormSpacing,
     this.cardPadding,
     this.darkDecorativeBackground = false,
+    this.showTitle = true,
   });
 
   final String title;
@@ -37,6 +38,7 @@ class AuthFormLayout extends StatelessWidget {
   final double? titleFormSpacing;
   final EdgeInsetsGeometry? cardPadding;
   final bool darkDecorativeBackground;
+  final bool showTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -164,32 +166,34 @@ class AuthFormLayout extends StatelessWidget {
                                 : FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: showTitle ? 6 : 10),
                       ],
-                      Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: welcomeText != null
-                              ? darkDecorativeBackground
-                                    ? const Color(0xFFAFB3B7)
-                                    : Colors.blue.shade600
-                              : darkDecorativeBackground
-                              ? const Color(0xFFAFB3B7)
-                              : visualRefresh
-                              ? Colors.grey.shade800
-                              : AppColors.textPrimary,
-                          fontSize: welcomeText != null
-                              ? 18
-                              : visualRefresh
-                              ? 26
-                              : null,
-                          fontWeight: visualRefresh
-                              ? FontWeight.w700
-                              : FontWeight.w800,
+                      if (showTitle) ...[
+                        Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: welcomeText != null
+                                ? darkDecorativeBackground
+                                      ? const Color(0xFFAFB3B7)
+                                      : Colors.blue.shade600
+                                : darkDecorativeBackground
+                                ? const Color(0xFFAFB3B7)
+                                : visualRefresh
+                                ? Colors.grey.shade800
+                                : AppColors.textPrimary,
+                            fontSize: welcomeText != null
+                                ? 18
+                                : visualRefresh
+                                ? 26
+                                : null,
+                            fontWeight: visualRefresh
+                                ? FontWeight.w700
+                                : FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                      ],
                       Text(
                         subtitle,
                         textAlign: TextAlign.center,
