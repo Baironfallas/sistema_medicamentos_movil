@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../app.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
@@ -34,6 +33,271 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscureConfirmPassword = true;
   String? _message;
   bool _isErrorMessage = true;
+
+  static const double _fieldSpacing = 10;
+  static const double _columnSpacing = 12;
+
+  InputDecoration _fieldDecoration({
+    required String labelText,
+    String? hintText,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final borderRadius = BorderRadius.circular(12);
+    final enabledBorder = OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: const BorderSide(color: Color(0xFF253745), width: 1.0),
+    );
+
+    return InputDecoration(
+      labelText: labelText,
+      hintText: hintText,
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFF9BA8AB)),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: const Color(0xFF06141B).withOpacity(0.70),
+      contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+      labelStyle: const TextStyle(
+        color: Color(0xFF9BA8AB),
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: const TextStyle(
+        color: Color(0xFF9BA8AB),
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
+      border: enabledBorder,
+      enabledBorder: enabledBorder,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.6),
+      ),
+      errorStyle: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 12),
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFFCCD0CF),
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _responsiveFieldRow({
+    required bool useTwoColumns,
+    required Widget first,
+    required Widget second,
+  }) {
+    if (!useTwoColumns) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          first,
+          const SizedBox(height: _fieldSpacing),
+          second,
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: first),
+        const SizedBox(width: _columnSpacing),
+        Expanded(child: second),
+      ],
+    );
+  }
+
+  Widget _identificationField() {
+    return TextFormField(
+      controller: _identificationController,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Identificación',
+        hintText: '123456789',
+        prefixIcon: Icons.badge_outlined,
+      ),
+      validator: (value) => AuthValidators.lengthBetween(
+        value,
+        'La identificación',
+        min: 6,
+        max: 20,
+      ),
+    );
+  }
+
+  Widget _firstNameField() {
+    return TextFormField(
+      controller: _firstNameController,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Primer nombre',
+        prefixIcon: Icons.person_outline,
+      ),
+      validator: (value) => AuthValidators.lengthBetween(
+        value,
+        'El primer nombre',
+        min: 2,
+        max: 20,
+      ),
+    );
+  }
+
+  Widget _secondNameField() {
+    return TextFormField(
+      controller: _secondNameController,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Segundo nombre',
+        hintText: 'Opcional',
+        prefixIcon: Icons.person_outline,
+      ),
+      validator: (value) => AuthValidators.lengthBetween(
+        value,
+        'El segundo nombre',
+        min: 2,
+        max: 20,
+        required: false,
+      ),
+    );
+  }
+
+  Widget _firstLastNameField() {
+    return TextFormField(
+      controller: _firstLastNameController,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Primer apellido',
+        prefixIcon: Icons.person_outline,
+      ),
+      validator: (value) => AuthValidators.lengthBetween(
+        value,
+        'El primer apellido',
+        min: 2,
+        max: 30,
+      ),
+    );
+  }
+
+  Widget _secondLastNameField() {
+    return TextFormField(
+      controller: _secondLastNameController,
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Segundo apellido',
+        hintText: 'Opcional',
+        prefixIcon: Icons.person_outline,
+      ),
+      validator: (value) => AuthValidators.lengthBetween(
+        value,
+        'El segundo apellido',
+        min: 2,
+        max: 30,
+        required: false,
+      ),
+    );
+  }
+
+  Widget _emailField() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      autofillHints: const [AutofillHints.email],
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Correo electrónico',
+        hintText: 'juan.perez@gmail.com',
+        prefixIcon: Icons.email_outlined,
+      ),
+      validator: AuthValidators.email,
+    );
+  }
+
+  Widget _passwordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      textInputAction: TextInputAction.next,
+      autofillHints: const [AutofillHints.newPassword],
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Contraseña',
+        hintText: 'Mínimo 8 caracteres',
+        prefixIcon: Icons.lock_outline,
+        suffixIcon: IconButton(
+          color: const Color(0xFF9BA8AB),
+          tooltip: _obscurePassword
+              ? 'Mostrar contraseña'
+              : 'Ocultar contraseña',
+          onPressed: () {
+            setState(() => _obscurePassword = !_obscurePassword);
+          },
+          icon: Icon(
+            _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+        ),
+      ),
+      validator: AuthValidators.password,
+    );
+  }
+
+  Widget _confirmPasswordField() {
+    return TextFormField(
+      controller: _confirmPasswordController,
+      obscureText: _obscureConfirmPassword,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _submit(),
+      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      decoration: _fieldDecoration(
+        labelText: 'Confirmar contraseña',
+        prefixIcon: Icons.lock_outline,
+        suffixIcon: IconButton(
+          color: const Color(0xFF9BA8AB),
+          tooltip: _obscureConfirmPassword
+              ? 'Mostrar contraseña'
+              : 'Ocultar contraseña',
+          onPressed: () {
+            setState(
+              () => _obscureConfirmPassword = !_obscureConfirmPassword,
+            );
+          },
+          icon: Icon(
+            _obscureConfirmPassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+        ),
+      ),
+      validator: (value) {
+        final passwordError = AuthValidators.password(value);
+        if (passwordError != null) {
+          return passwordError;
+        }
+        if (value != _passwordController.text) {
+          return 'Las contraseñas no coinciden.';
+        }
+        return null;
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -121,198 +385,94 @@ class _RegisterPageState extends State<RegisterPage> {
     return AuthFormLayout(
       title: 'Crear cuenta',
       subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo',
+      visualRefresh: true,
+      maxWidth: 720,
+      headerHeight: 68,
+      headerIconSize: 32,
+      headerTitleSpacing: 14,
+      titleFormSpacing: 14,
+      cardPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      headerLabel: 'Registro seguro para tu salud',
+      scrollBottomPadding: 52,
+      darkDecorativeBackground: true,
       child: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_message != null) ...[
-              AuthMessage(message: _message!, isError: _isErrorMessage),
-              const SizedBox(height: 18),
-            ],
-            TextFormField(
-              controller: _identificationController,
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Identificación',
-                hintText: '123456789',
-                prefixIcon: Icon(Icons.badge_outlined),
-              ),
-              validator: (value) => AuthValidators.lengthBetween(
-                value,
-                'La identificación',
-                min: 6,
-                max: 20,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _firstNameController,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Primer nombre',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              validator: (value) => AuthValidators.lengthBetween(
-                value,
-                'El primer nombre',
-                min: 2,
-                max: 20,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _secondNameController,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Segundo nombre',
-                hintText: 'Opcional',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              validator: (value) => AuthValidators.lengthBetween(
-                value,
-                'El segundo nombre',
-                min: 2,
-                max: 20,
-                required: false,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _firstLastNameController,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Primer apellido',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              validator: (value) => AuthValidators.lengthBetween(
-                value,
-                'El primer apellido',
-                min: 2,
-                max: 30,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _secondLastNameController,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Segundo apellido',
-                hintText: 'Opcional',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              validator: (value) => AuthValidators.lengthBetween(
-                value,
-                'El segundo apellido',
-                min: 2,
-                max: 30,
-                required: false,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              autofillHints: const [AutofillHints.email],
-              decoration: const InputDecoration(
-                labelText: 'Correo electrónico',
-                hintText: 'juan.perez@gmail.com',
-                prefixIcon: Icon(Icons.email_outlined),
-              ),
-              validator: AuthValidators.email,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              textInputAction: TextInputAction.next,
-              autofillHints: const [AutofillHints.newPassword],
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                hintText: 'Mínimo 8 caracteres',
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  tooltip: _obscurePassword
-                      ? 'Mostrar contraseña'
-                      : 'Ocultar contraseña',
-                  onPressed: () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  },
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                  ),
-                ),
-              ),
-              validator: AuthValidators.password,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _confirmPasswordController,
-              obscureText: _obscureConfirmPassword,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _submit(),
-              decoration: InputDecoration(
-                labelText: 'Confirmar contraseña',
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  tooltip: _obscureConfirmPassword
-                      ? 'Mostrar contraseña'
-                      : 'Ocultar contraseña',
-                  onPressed: () {
-                    setState(
-                      () => _obscureConfirmPassword = !_obscureConfirmPassword,
-                    );
-                  },
-                  icon: Icon(
-                    _obscureConfirmPassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                  ),
-                ),
-              ),
-              validator: (value) {
-                final passwordError = AuthValidators.password(value);
-                if (passwordError != null) {
-                  return passwordError;
-                }
-                if (value != _passwordController.text) {
-                  return 'Las contraseñas no coinciden.';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 22),
-            PrimaryLoadingButton(
-              label: 'Registrarme',
-              isLoading: _isLoading,
-              onPressed: _submit,
-            ),
-            const SizedBox(height: 18),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final useTwoColumns = constraints.maxWidth > 650;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  '¿Ya tienes cuenta?',
-                  style: TextStyle(color: AppColors.textSecondary),
+                if (_message != null) ...[
+                  AuthMessage(message: _message!, isError: _isErrorMessage),
+                  const SizedBox(height: 14),
+                ],
+                _sectionTitle('Datos personales'),
+                _identificationField(),
+                const SizedBox(height: _fieldSpacing),
+                _responsiveFieldRow(
+                  useTwoColumns: useTwoColumns,
+                  first: _firstNameField(),
+                  second: _secondNameField(),
                 ),
-                TextButton(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          Navigator.of(context).pushReplacementNamed(
-                            MedicineReminderApp.loginRoute,
-                          );
-                        },
-                  child: const Text('Inicia sesión'),
+                const SizedBox(height: _fieldSpacing),
+                _responsiveFieldRow(
+                  useTwoColumns: useTwoColumns,
+                  first: _firstLastNameField(),
+                  second: _secondLastNameField(),
+                ),
+                const SizedBox(height: 14),
+                _sectionTitle('Datos de acceso'),
+                _emailField(),
+                const SizedBox(height: _fieldSpacing),
+                _responsiveFieldRow(
+                  useTwoColumns: useTwoColumns,
+                  first: _passwordField(),
+                  second: _confirmPasswordField(),
+                ),
+                const SizedBox(height: 18),
+                PrimaryLoadingButton(
+                  label: 'Registrarme',
+                  isLoading: _isLoading,
+                  onPressed: _submit,
+                  useGradient: true,
+                  gradientColors: const [
+                    Color(0xFF4A5C6A),
+                    Color(0xFF9BA8AB),
+                  ],
+                  textColor: const Color(0xFF06141B),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    const Text(
+                      '¿Ya tienes cuenta?',
+                      style: TextStyle(color: Color(0xFF9BA8AB)),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFCCD0CF),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              Navigator.of(context).pushReplacementNamed(
+                                MedicineReminderApp.loginRoute,
+                              );
+                            },
+                      child: const Text('Inicia sesión'),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

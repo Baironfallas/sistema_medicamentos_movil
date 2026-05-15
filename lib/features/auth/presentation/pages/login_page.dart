@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../app.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
@@ -27,6 +26,39 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   String? _message;
   bool _isErrorMessage = true;
+
+  InputDecoration _fieldDecoration({
+    required String labelText,
+    required String hintText,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    final borderRadius = BorderRadius.circular(12);
+
+    return InputDecoration(
+      labelText: labelText,
+      hintText: hintText,
+      filled: true,
+      fillColor: const Color(0xFF06141B).withOpacity(0.70),
+      border: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF253745)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF253745), width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.5),
+      ),
+      labelStyle: const TextStyle(color: Color(0xFF9BA8AB)),
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFF9BA8AB)),
+      suffixIcon: suffixIcon,
+      hintStyle: const TextStyle(color: Color(0xFF9BA8AB), fontSize: 14),
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+    );
+  }
 
   @override
   void dispose() {
@@ -87,7 +119,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return AuthFormLayout(
       title: 'Iniciar sesión',
-      subtitle: 'Accede para gestionar tus medicamentos y recordatorios',
+      subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo.',
+      welcomeText: 'Bienvenido de nuevo',
+      supportingText: 'Cuida tu salud de forma simple y segura.',
+      headerLabel: 'Recordatorios inteligentes para tu salud',
+      visualRefresh: true,
+      headerHeight: 102,
+      headerIconSize: 36,
+      headerTitleSpacing: 22,
+      titleFormSpacing: 28,
+      darkDecorativeBackground: true,
+      showTitle: false,
       child: Form(
         key: _formKey,
         child: Column(
@@ -102,10 +144,11 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              decoration: const InputDecoration(
+              style: const TextStyle(color: Color(0xFFCCD0CF)),
+              decoration: _fieldDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: Icons.email_outlined,
               ),
               validator: AuthValidators.email,
             ),
@@ -116,10 +159,11 @@ class _LoginPageState extends State<LoginPage> {
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               onFieldSubmitted: (_) => _submit(),
-              decoration: InputDecoration(
+              style: const TextStyle(color: Color(0xFFCCD0CF)),
+              decoration: _fieldDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: Icons.lock_outline,
                 suffixIcon: IconButton(
                   tooltip: _obscurePassword
                       ? 'Mostrar contraseña'
@@ -131,27 +175,40 @@ class _LoginPageState extends State<LoginPage> {
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
+                    color: const Color(0xFF9BA8AB),
                   ),
                 ),
               ),
               validator: AuthValidators.password,
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             PrimaryLoadingButton(
               label: 'Iniciar sesión',
               isLoading: _isLoading,
               onPressed: _submit,
+              useGradient: true,
+              gradientColors: const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
+              textColor: const Color(0xFF06141B),
             ),
-            const SizedBox(height: 18),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   '¿No tienes cuenta?',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(
+                    color: const Color(0xFF9BA8AB),
+                    fontSize: 14,
+                  ),
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFCCD0CF),
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   onPressed: _isLoading
                       ? null
                       : () {
