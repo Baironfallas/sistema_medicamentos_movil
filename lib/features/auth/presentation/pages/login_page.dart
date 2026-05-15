@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../app.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
@@ -88,6 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     return AuthFormLayout(
       title: 'Iniciar sesión',
       subtitle: 'Accede para gestionar tus medicamentos y recordatorios',
+      visualRefresh: true,
       child: Form(
         key: _formKey,
         child: Column(
@@ -102,10 +102,35 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
-                prefixIcon: Icon(Icons.email_outlined),
+                filled: true,
+                fillColor: Colors.blue.shade50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue.shade200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Colors.blue.shade600,
+                    width: 1.8,
+                  ),
+                ),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: Colors.blue.shade400,
+                ),
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 16,
+                ),
               ),
               validator: AuthValidators.email,
             ),
@@ -119,7 +144,27 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',
-                prefixIcon: const Icon(Icons.lock_outline),
+                filled: true,
+                fillColor: Colors.blue.shade50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue.shade200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Colors.blue.shade600,
+                    width: 1.8,
+                  ),
+                ),
+                prefixIcon: Icon(
+                  Icons.lock_outline,
+                  color: Colors.blue.shade400,
+                ),
                 suffixIcon: IconButton(
                   tooltip: _obscurePassword
                       ? 'Mostrar contraseña'
@@ -131,27 +176,42 @@ class _LoginPageState extends State<LoginPage> {
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
+                    color: _obscurePassword
+                        ? Colors.grey.shade400
+                        : Colors.blue.shade500,
                   ),
+                ),
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 16,
                 ),
               ),
               validator: AuthValidators.password,
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             PrimaryLoadingButton(
               label: 'Iniciar sesión',
               isLoading: _isLoading,
               onPressed: _submit,
+              useGradient: true,
             ),
-            const SizedBox(height: 18),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   '¿No tienes cuenta?',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue.shade600,
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   onPressed: _isLoading
                       ? null
                       : () {
