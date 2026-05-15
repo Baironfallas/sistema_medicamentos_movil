@@ -8,6 +8,9 @@ class AuthFormLayout extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.child,
+    this.welcomeText,
+    this.supportingText,
+    this.headerLabel,
     this.visualRefresh = false,
     this.maxWidth = 480,
     this.headerHeight,
@@ -20,6 +23,9 @@ class AuthFormLayout extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget child;
+  final String? welcomeText;
+  final String? supportingText;
+  final String? headerLabel;
   final bool visualRefresh;
   final double maxWidth;
   final double? headerHeight;
@@ -68,32 +74,70 @@ class AuthFormLayout extends StatelessWidget {
                             boxShadow: visualRefresh
                                 ? [
                                     BoxShadow(
-                                      color: Colors.blue.withValues(
-                                        alpha: 0.15,
-                                      ),
-                                      blurRadius: 8,
+                                      color: Colors.blue.withOpacity(0.15),
+                                      blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
                                   ]
                                 : null,
                           ),
-                          child: Icon(
-                            Icons.medication_liquid_outlined,
-                            color: AppColors.primary,
-                            size:
-                                headerIconSize ?? (visualRefresh ? 44 : 34),
-                          ),
+                          child: headerLabel == null
+                              ? Icon(
+                                  Icons.medication_liquid_outlined,
+                                  color: AppColors.primary,
+                                  size: headerIconSize ??
+                                      (visualRefresh ? 44 : 34),
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.medication_liquid_outlined,
+                                      color: AppColors.primary,
+                                      size: headerIconSize ??
+                                          (visualRefresh ? 38 : 34),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      headerLabel!,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.blue.shade700,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                       SizedBox(height: headerTitleSpacing ?? 28),
+                      if (welcomeText != null) ...[
+                        Text(
+                          welcomeText!,
+                          textAlign: TextAlign.center,
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: AppColors.textPrimary,
+                            fontSize: visualRefresh ? 28 : null,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                      ],
                       Text(
                         title,
                         textAlign: TextAlign.center,
                         style: textTheme.headlineSmall?.copyWith(
-                          color: visualRefresh
+                          color: welcomeText != null
+                              ? Colors.blue.shade600
+                              : visualRefresh
                               ? Colors.grey.shade800
                               : AppColors.textPrimary,
-                          fontSize: visualRefresh ? 26 : null,
+                          fontSize: welcomeText != null
+                              ? 18
+                              : visualRefresh
+                              ? 26
+                              : null,
                           fontWeight: visualRefresh
                               ? FontWeight.w700
                               : FontWeight.w800,
@@ -114,6 +158,19 @@ class AuthFormLayout extends StatelessWidget {
                           height: 1.4,
                         ),
                       ),
+                      if (supportingText != null) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          supportingText!,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: Colors.grey.shade500,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
                       SizedBox(
                         height: titleFormSpacing ?? (visualRefresh ? 24 : 28),
                       ),

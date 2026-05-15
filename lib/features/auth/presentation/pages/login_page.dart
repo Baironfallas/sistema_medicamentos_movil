@@ -87,7 +87,14 @@ class _LoginPageState extends State<LoginPage> {
     return AuthFormLayout(
       title: 'Iniciar sesión',
       subtitle: 'Accede para gestionar tus medicamentos y recordatorios',
+      welcomeText: 'Bienvenido de nuevo',
+      supportingText: 'Tu tratamiento organizado, siempre a tiempo.',
+      headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
+      headerHeight: 102,
+      headerIconSize: 36,
+      headerTitleSpacing: 22,
+      titleFormSpacing: 32,
       child: Form(
         key: _formKey,
         child: Column(
