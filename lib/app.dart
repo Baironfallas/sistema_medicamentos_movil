@@ -5,6 +5,8 @@ import 'features/auth/data/auth_storage.dart';
 import 'features/auth/presentation/pages/home_page.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
+import 'features/medications/presentation/pages/medication_list_page.dart';
+import 'features/medications/presentation/pages/today_intakes_page.dart';
 
 class MedicineReminderApp extends StatelessWidget {
   const MedicineReminderApp({super.key});
@@ -12,6 +14,8 @@ class MedicineReminderApp extends StatelessWidget {
   static const loginRoute = '/login';
   static const registerRoute = '/register';
   static const homeRoute = '/home';
+  static const medicationsRoute = '/medications';
+  static const todayIntakesRoute = '/today-intakes';
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,8 @@ class MedicineReminderApp extends StatelessWidget {
         loginRoute: (_) => const LoginPage(),
         registerRoute: (_) => const RegisterPage(),
         homeRoute: (_) => const HomePage(),
+        medicationsRoute: (_) => const MedicationListPage(),
+        todayIntakesRoute: (_) => const TodayIntakesPage(),
       },
       home: const AuthGate(),
     );
