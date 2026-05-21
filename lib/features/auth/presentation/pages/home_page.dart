@@ -22,8 +22,8 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Cerrar sesión'),
-          content: const Text('¿Deseas salir de tu cuenta?'),
+          title: const Text('Cerrar sesion'),
+          content: const Text('Deseas salir de tu cuenta?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
         ..showSnackBar(
           const SnackBar(
             content: Text(
-              'No se pudo cerrar la sesión en el servidor, pero tu sesión local fue finalizada.',
+              'No se pudo cerrar la sesion en el servidor, pero tu sesion local fue finalizada.',
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Cerrar sesión',
+            tooltip: 'Cerrar sesion',
             onPressed: _isLoggingOut ? null : _confirmLogout,
             icon: _isLoggingOut
                 ? const SizedBox(
@@ -275,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                                         SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            'Tu espacio de salud está listo para usar.',
+                                            'Tu espacio de salud esta listo para usar.',
                                             style: TextStyle(
                                               color: Color(0xFFCCD0CF),
                                               fontSize: 14,
@@ -285,6 +285,36 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: FilledButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          MedicineReminderApp.medicationsRoute,
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.medication_outlined,
+                                      ),
+                                      label: const Text('Mis medicamentos'),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          MedicineReminderApp.todayIntakesRoute,
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.notifications_active_outlined,
+                                      ),
+                                      label: const Text('Tomas de hoy'),
                                     ),
                                   ),
                                 ],
