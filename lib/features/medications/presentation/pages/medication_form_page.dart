@@ -147,10 +147,7 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          SnackBar(
-            content: Text(error),
-            behavior: SnackBarBehavior.floating,
-          ),
+          SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
         );
     }
   }
@@ -252,8 +249,9 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                       readOnly: true,
                       onTap: _isEditing ? null : _pickStartDate,
                       style: const TextStyle(color: Color(0xFFCCD0CF)),
-                      decoration: _fieldDecoration('Fecha de inicio')
-                          .copyWith(suffixIcon: const Icon(Icons.event)),
+                      decoration: _fieldDecoration(
+                        'Fecha de inicio',
+                      ).copyWith(suffixIcon: const Icon(Icons.event)),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Selecciona la fecha de inicio.';

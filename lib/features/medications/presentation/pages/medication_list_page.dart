@@ -31,10 +31,8 @@ class _MedicationListPageState extends State<MedicationListPage> {
   Future<void> _openForm({Medication? medication}) async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => MedicationFormPage(
-          controller: _controller,
-          medication: medication,
-        ),
+        builder: (_) =>
+            MedicationFormPage(controller: _controller, medication: medication),
       ),
     );
 

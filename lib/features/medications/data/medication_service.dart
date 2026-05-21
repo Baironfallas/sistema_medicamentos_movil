@@ -31,10 +31,12 @@ class MedicationService {
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
 
-      final items = _extractList(
-        decoded,
-        ['data', 'items', 'medications', 'results'],
-      );
+      final items = _extractList(decoded, [
+        'data',
+        'items',
+        'medications',
+        'results',
+      ]);
 
       return items
           .whereType<Map>()
@@ -130,10 +132,13 @@ class MedicationService {
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
 
-      final items = _extractList(
-        decoded,
-        ['data', 'items', 'intakes', 'todayIntakes', 'medicationIntakes'],
-      );
+      final items = _extractList(decoded, [
+        'data',
+        'items',
+        'intakes',
+        'todayIntakes',
+        'medicationIntakes',
+      ]);
 
       return items
           .whereType<Map>()

@@ -53,9 +53,9 @@ class MedicationIntake {
         _string(json['intakeTime']);
 
     final hour =
-        _string(json['hour']) ?? _string(json['scheduledHour']) ?? _string(
-          json['hourLabel'],
-        );
+        _string(json['hour']) ??
+        _string(json['scheduledHour']) ??
+        _string(json['hourLabel']);
 
     final date =
         _string(json['date']) ??
