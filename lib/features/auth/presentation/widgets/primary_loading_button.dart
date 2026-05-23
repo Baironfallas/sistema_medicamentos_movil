@@ -85,9 +85,7 @@ class PrimaryLoadingButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         minimumSize: const Size.fromHeight(56),
         padding: const EdgeInsets.symmetric(vertical: 16),
       ),
