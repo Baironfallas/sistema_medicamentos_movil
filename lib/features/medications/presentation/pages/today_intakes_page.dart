@@ -93,10 +93,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.border,
-          width: 1.0,
-        ),
+        border: Border.all(color: AppColors.border, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -128,7 +125,9 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.35)),
+                  border: Border.all(
+                    color: statusColor.withValues(alpha: 0.35),
+                  ),
                 ),
                 child: Text(
                   statusLabel,
