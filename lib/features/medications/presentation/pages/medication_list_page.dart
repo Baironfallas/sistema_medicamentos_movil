@@ -173,10 +173,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.border,
-          width: 1.0,
-        ),
+        border: Border.all(color: AppColors.border, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -217,17 +214,17 @@ class _MedicationListPageState extends State<MedicationListPage> {
               IconButton(
                 tooltip: 'Editar',
                 onPressed: () => _openForm(medication: medication),
-                icon: const Icon(Icons.edit_outlined, color: AppColors.secondary),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.secondary,
+                ),
               ),
               IconButton(
                 tooltip: 'Eliminar',
                 onPressed: _controller.isDeleting
                     ? null
                     : () => _confirmDelete(medication),
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: AppColors.error,
-                ),
+                icon: const Icon(Icons.delete_outline, color: AppColors.error),
               ),
             ],
           ),
