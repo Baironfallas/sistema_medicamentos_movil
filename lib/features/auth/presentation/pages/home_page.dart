@@ -34,10 +34,7 @@ class _HomePageState extends State<HomePage> {
           ),
           content: const Text(
             'Deseas salir de tu cuenta?',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
           actions: [
             TextButton(
@@ -129,7 +126,10 @@ class _HomePageState extends State<HomePage> {
                       color: AppColors.primary,
                     ),
                   )
-                : const Icon(Icons.logout_outlined, color: AppColors.textSecondary),
+                : const Icon(
+                    Icons.logout_outlined,
+                    color: AppColors.textSecondary,
+                  ),
           ),
           const SizedBox(width: 8),
         ],
@@ -139,9 +139,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-            ),
+            decoration: const BoxDecoration(color: AppColors.background),
           ),
           SafeArea(
             child: LayoutBuilder(
@@ -200,7 +198,9 @@ class _HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.circular(26),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.primary.withValues(alpha: 0.2),
+                                          color: AppColors.primary.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           blurRadius: 16,
                                           offset: const Offset(0, 6),
                                         ),
@@ -287,9 +287,14 @@ class _HomePageState extends State<HomePage> {
                                       style: FilledButton.styleFrom(
                                         backgroundColor: AppColors.primary,
                                         foregroundColor: AppColors.surface,
-                                        minimumSize: const Size(double.infinity, 56),
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          56,
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
                                         ),
                                       ),
                                       icon: const Icon(
@@ -319,9 +324,14 @@ class _HomePageState extends State<HomePage> {
                                           color: AppColors.border,
                                           width: 1.5,
                                         ),
-                                        minimumSize: const Size(double.infinity, 56),
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          56,
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
                                         ),
                                       ),
                                       icon: const Icon(
