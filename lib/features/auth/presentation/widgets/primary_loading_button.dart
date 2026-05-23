@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class PrimaryLoadingButton extends StatelessWidget {
   const PrimaryLoadingButton({
     super.key,
@@ -26,12 +28,11 @@ class PrimaryLoadingButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors:
-                gradientColors ??
-                const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
+                gradientColors ?? const [AppColors.primary, AppColors.primary],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -40,9 +41,9 @@ class PrimaryLoadingButton extends StatelessWidget {
             shadowColor: Colors.transparent,
             elevation: 0,
             padding: EdgeInsets.zero,
-            minimumSize: const Size.fromHeight(54),
+            minimumSize: const Size.fromHeight(56),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(18),
             ),
             textStyle: const TextStyle(
               fontSize: 16,
@@ -52,7 +53,7 @@ class PrimaryLoadingButton extends StatelessWidget {
           onPressed: isLoading ? null : onPressed,
           child: Container(
             alignment: Alignment.center,
-            constraints: const BoxConstraints(minHeight: 54),
+            constraints: const BoxConstraints(minHeight: 56),
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
@@ -82,6 +83,12 @@ class PrimaryLoadingButton extends StatelessWidget {
     }
 
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        minimumSize: const Size.fromHeight(56),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      ),
       onPressed: isLoading ? null : onPressed,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 180),

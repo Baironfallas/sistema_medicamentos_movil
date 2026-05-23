@@ -326,7 +326,7 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: const Color(0xFF11212D).withOpacity(0.75),
+      fillColor: const Color(0xFF11212D).withValues(alpha: 0.75),
       labelStyle: const TextStyle(color: Color(0xFF9BA8AB)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

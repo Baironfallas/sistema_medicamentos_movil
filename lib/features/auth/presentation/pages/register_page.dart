@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
 import '../../models/register_request.dart';
@@ -46,24 +47,24 @@ class _RegisterPageState extends State<RegisterPage> {
     final borderRadius = BorderRadius.circular(12);
     final enabledBorder = OutlineInputBorder(
       borderRadius: borderRadius,
-      borderSide: const BorderSide(color: Color(0xFF253745), width: 1.0),
+      borderSide: const BorderSide(color: AppColors.border, width: 1.0),
     );
 
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
-      prefixIcon: Icon(prefixIcon, color: const Color(0xFF9BA8AB)),
+      prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: const Color(0xFF06141B).withOpacity(0.70),
+      fillColor: AppColors.surface,
       contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
       labelStyle: const TextStyle(
-        color: Color(0xFF9BA8AB),
+        color: AppColors.textSecondary,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
       hintStyle: const TextStyle(
-        color: Color(0xFF9BA8AB),
+        color: AppColors.textSecondary,
         fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
@@ -71,9 +72,9 @@ class _RegisterPageState extends State<RegisterPage> {
       enabledBorder: enabledBorder,
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.6),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
       ),
-      errorStyle: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 12),
+      errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
     );
   }
 
@@ -83,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Text(
         title,
         style: const TextStyle(
-          color: Color(0xFFCCD0CF),
+          color: AppColors.textPrimary,
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
@@ -122,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: _identificationController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Identificación',
         hintText: '123456789',
@@ -141,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Primer nombre',
         prefixIcon: Icons.person_outline,
@@ -159,7 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Segundo nombre',
         hintText: 'Opcional',
@@ -179,7 +180,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _firstLastNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Primer apellido',
         prefixIcon: Icons.person_outline,
@@ -197,7 +198,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextFormField(
       controller: _secondLastNameController,
       textInputAction: TextInputAction.next,
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Segundo apellido',
         hintText: 'Opcional',
@@ -219,7 +220,7 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Correo electrónico',
         hintText: 'juan.perez@gmail.com',
@@ -235,13 +236,13 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.newPassword],
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Contraseña',
         hintText: 'Mínimo 8 caracteres',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: const Color(0xFF9BA8AB),
+          color: AppColors.textSecondary,
           tooltip: _obscurePassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
@@ -265,19 +266,17 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: _obscureConfirmPassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _submit(),
-      style: const TextStyle(color: Color(0xFFCCD0CF)),
+      style: const TextStyle(color: AppColors.textPrimary),
       decoration: _fieldDecoration(
         labelText: 'Confirmar contraseña',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
-          color: const Color(0xFF9BA8AB),
+          color: AppColors.textSecondary,
           tooltip: _obscureConfirmPassword
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
           onPressed: () {
-            setState(
-              () => _obscureConfirmPassword = !_obscureConfirmPassword,
-            );
+            setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
           },
           icon: Icon(
             _obscureConfirmPassword
@@ -436,12 +435,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   label: 'Registrarme',
                   isLoading: _isLoading,
                   onPressed: _submit,
-                  useGradient: true,
-                  gradientColors: const [
-                    Color(0xFF4A5C6A),
-                    Color(0xFF9BA8AB),
-                  ],
-                  textColor: const Color(0xFF06141B),
+                  useGradient: false,
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -450,14 +444,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text(
                       '¿Ya tienes cuenta?',
-                      style: TextStyle(color: Color(0xFF9BA8AB)),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFCCD0CF),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        foregroundColor: AppColors.primary,
+                        textStyle: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       onPressed: _isLoading
                           ? null

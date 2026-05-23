@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_exception.dart';
 import '../../data/auth_service.dart';
 import '../../models/login_request.dart';
@@ -33,30 +34,41 @@ class _LoginPageState extends State<LoginPage> {
     required IconData prefixIcon,
     Widget? suffixIcon,
   }) {
-    final borderRadius = BorderRadius.circular(12);
+    final borderRadius = BorderRadius.circular(16);
 
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
       filled: true,
-      fillColor: const Color(0xFF06141B).withOpacity(0.70),
+      fillColor: AppColors.surface,
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF253745)),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF253745), width: 1.0),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2.0),
       ),
-      labelStyle: const TextStyle(color: Color(0xFF9BA8AB)),
-      prefixIcon: Icon(prefixIcon, color: const Color(0xFF9BA8AB)),
+      labelStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontFamily: 'Inter',
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
-      hintStyle: const TextStyle(color: Color(0xFF9BA8AB), fontSize: 14),
-      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+      hintStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 14,
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w400,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      constraints: const BoxConstraints(minHeight: 56, maxHeight: 60),
     );
   }
 
@@ -118,14 +130,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return AuthFormLayout(
-      title: 'Iniciar sesión',
-      subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo.',
+      title: 'Medora',
+      subtitle: 'Tu salud organizada en un solo lugar',
       welcomeText: 'Bienvenido de nuevo',
-      supportingText: 'Cuida tu salud de forma simple y segura.',
+      supportingText:
+          'Organiza tus tratamientos y mantén el control de tu salud.',
       headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
       headerHeight: 102,
-      headerIconSize: 36,
+      headerIconSize: 52,
       headerTitleSpacing: 22,
       titleFormSpacing: 28,
       darkDecorativeBackground: true,
@@ -144,7 +157,12 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              style: const TextStyle(color: Color(0xFFCCD0CF)),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: _fieldDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
@@ -159,7 +177,12 @@ class _LoginPageState extends State<LoginPage> {
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               onFieldSubmitted: (_) => _submit(),
-              style: const TextStyle(color: Color(0xFFCCD0CF)),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: _fieldDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',
@@ -175,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                     _obscurePassword
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
-                    color: const Color(0xFF9BA8AB),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -186,9 +209,7 @@ class _LoginPageState extends State<LoginPage> {
               label: 'Iniciar sesión',
               isLoading: _isLoading,
               onPressed: _submit,
-              useGradient: true,
-              gradientColors: const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
-              textColor: const Color(0xFF06141B),
+              useGradient: false,
             ),
             const SizedBox(height: 16),
             Row(
@@ -197,13 +218,13 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   '¿No tienes cuenta?',
                   style: TextStyle(
-                    color: const Color(0xFF9BA8AB),
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFFCCD0CF),
+                    foregroundColor: AppColors.primary,
                     textStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
