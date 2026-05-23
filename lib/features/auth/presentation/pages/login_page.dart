@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     required IconData prefixIcon,
     Widget? suffixIcon,
   }) {
-    final borderRadius = BorderRadius.circular(12);
+    final borderRadius = BorderRadius.circular(16);
 
     return InputDecoration(
       labelText: labelText,
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       fillColor: AppColors.surface,
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.border),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
@@ -51,13 +51,24 @@ class _LoginPageState extends State<LoginPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2.0),
       ),
-      labelStyle: const TextStyle(color: AppColors.textSecondary),
+      labelStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontFamily: 'Inter',
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
       prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
-      hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+      hintStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 14,
+        fontFamily: 'Inter',
+        fontWeight: FontWeight.w400,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      constraints: const BoxConstraints(minHeight: 56, maxHeight: 60),
     );
   }
 
@@ -119,14 +130,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return AuthFormLayout(
-      title: 'Iniciar sesión',
-      subtitle: 'Organiza tus medicamentos y recibe recordatorios a tiempo.',
+      title: 'Sistema Inteligente para Recordar Medicamentos',
+      subtitle: 'Tu salud organizada en un solo lugar',
       welcomeText: 'Bienvenido de nuevo',
       supportingText: 'Cuida tu salud de forma simple y segura.',
       headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
       headerHeight: 102,
-      headerIconSize: 36,
+      headerIconSize: 52,
       headerTitleSpacing: 22,
       titleFormSpacing: 28,
       darkDecorativeBackground: true,
@@ -145,7 +156,12 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: _fieldDecoration(
                 labelText: 'Correo electrónico',
                 hintText: 'juan.perez@gmail.com',
@@ -160,7 +176,12 @@ class _LoginPageState extends State<LoginPage> {
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               onFieldSubmitted: (_) => _submit(),
-              style: const TextStyle(color: AppColors.textPrimary),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: _fieldDecoration(
                 labelText: 'Contraseña',
                 hintText: 'Password123',

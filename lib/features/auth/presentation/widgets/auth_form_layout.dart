@@ -53,7 +53,7 @@ class AuthFormLayout extends StatelessWidget {
             bottomLeft: Radius.circular(24),
             bottomRight: Radius.circular(24),
           )
-        : BorderRadius.circular(20);
+        : BorderRadius.circular(24);
 
     final content = SafeArea(
       child: LayoutBuilder(
@@ -95,12 +95,8 @@ class AuthFormLayout extends StatelessWidget {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.primary.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          AppColors.secondary.withValues(
-                                            alpha: 0.15,
-                                          ),
+                                          const Color(0xFF14B8A6),
+                                          const Color(0xFF5EEAD4),
                                         ],
                                       )
                                     : null,
@@ -196,6 +192,7 @@ class AuthFormLayout extends StatelessWidget {
                             fontWeight: darkDecorativeBackground
                                 ? FontWeight.w700
                                 : FontWeight.w800,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                         SizedBox(height: showTitle ? 6 : 10),
@@ -240,6 +237,7 @@ class AuthFormLayout extends StatelessWidget {
                               ? FontWeight.w500
                               : FontWeight.normal,
                           height: 1.4,
+                          fontFamily: 'Inter',
                         ),
                       ),
                       if (supportingText != null) ...[
