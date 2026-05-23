@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class InfoBanner extends StatelessWidget {
   const InfoBanner({super.key, required this.message, this.isError = true});
 
@@ -8,7 +10,7 @@ class InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isError ? const Color(0xFFFFB4AB) : const Color(0xFF86EFAC);
+    final color = isError ? AppColors.error : AppColors.success;
 
     return Container(
       padding: const EdgeInsets.all(12),
