@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../models/medication.dart';
 import '../controllers/medication_controller.dart';
 import '../widgets/info_banner.dart';
@@ -155,11 +156,21 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF06141B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF06141B),
-        foregroundColor: const Color(0xFFCCD0CF),
-        title: Text(_isEditing ? 'Editar medicamento' : 'Nuevo medicamento'),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 1,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.border.withValues(alpha: 0.1),
+        title: Text(
+          _isEditing ? 'Editar medicamento' : 'Nuevo medicamento',
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 19,
+          ),
+        ),
       ),
       body: AnimatedBuilder(
         animation: widget.controller,
@@ -180,7 +191,11 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                     TextFormField(
                       controller: _nameController,
                       textInputAction: TextInputAction.next,
-                      style: const TextStyle(color: Color(0xFFCCD0CF)),
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                       decoration: _fieldDecoration('Nombre'),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -193,7 +208,11 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                     TextFormField(
                       controller: _doseController,
                       textInputAction: TextInputAction.next,
-                      style: const TextStyle(color: Color(0xFFCCD0CF)),
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                       decoration: _fieldDecoration('Dosis (opcional)'),
                     ),
                     const SizedBox(height: 12),
@@ -201,7 +220,11 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                       controller: _descriptionController,
                       textInputAction: TextInputAction.next,
                       maxLines: 2,
-                      style: const TextStyle(color: Color(0xFFCCD0CF)),
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                       decoration: _fieldDecoration('Descripcion (opcional)'),
                     ),
                     const SizedBox(height: 18),
@@ -214,7 +237,11 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.next,
                             readOnly: _isEditing,
-                            style: const TextStyle(color: Color(0xFFCCD0CF)),
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                             decoration: _fieldDecoration('Cantidad por toma'),
                             validator: (value) {
                               if (!_isPositiveInteger(value)) {
@@ -231,7 +258,11 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.next,
                             readOnly: _isEditing,
-                            style: const TextStyle(color: Color(0xFFCCD0CF)),
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                             decoration: _fieldDecoration('Total de pastillas'),
                             validator: (value) {
                               if (!_isPositiveInteger(value)) {
@@ -248,10 +279,19 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                       controller: _startDateController,
                       readOnly: true,
                       onTap: _isEditing ? null : _pickStartDate,
-                      style: const TextStyle(color: Color(0xFFCCD0CF)),
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                       decoration: _fieldDecoration(
                         'Fecha de inicio',
-                      ).copyWith(suffixIcon: const Icon(Icons.event)),
+                      ).copyWith(
+                        suffixIcon: const Icon(
+                          Icons.event,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Selecciona la fecha de inicio.';
@@ -263,7 +303,7 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                     _sectionTitle('Horarios de toma'),
                     Text(
                       'Frecuencia: ${_schedules.length} al dia.',
-                      style: const TextStyle(color: Color(0xFF9BA8AB)),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -272,16 +312,36 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                       children: [
                         for (final hour in _schedules)
                           Chip(
-                            label: Text(hour),
+                            label: Text(
+                              hour,
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            backgroundColor: AppColors.background,
+                            side: const BorderSide(color: AppColors.border),
                             onDeleted: _isEditing
                                 ? null
                                 : () => _removeSchedule(hour),
                           ),
                         if (!_isEditing)
                           ActionChip(
-                            label: const Text('Agregar horario'),
+                            label: const Text(
+                              'Agregar horario',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            backgroundColor: AppColors.background,
+                            side: const BorderSide(color: AppColors.primary),
                             onPressed: _addSchedule,
-                            avatar: const Icon(Icons.add, size: 18),
+                            avatar: const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
                           ),
                       ],
                     ),
@@ -289,13 +349,21 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                       const SizedBox(height: 8),
                       Text(
                         _scheduleError!,
-                        style: const TextStyle(color: Color(0xFFFFB4AB)),
+                        style: const TextStyle(color: AppColors.error),
                       ),
                     ],
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.surface,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
                         onPressed: widget.controller.isSaving ? null : _submit,
                         child: widget.controller.isSaving
                             ? const SizedBox(
@@ -303,12 +371,17 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
+                                  color: AppColors.surface,
                                 ),
                               )
                             : Text(
                                 _isEditing
                                     ? 'Guardar cambios'
                                     : 'Crear medicamento',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                       ),
                     ),
@@ -326,32 +399,52 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: const Color(0xFF11212D).withValues(alpha: 0.75),
-      labelStyle: const TextStyle(color: Color(0xFF9BA8AB)),
+      fillColor: AppColors.surface,
+      labelStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 14,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF253745)),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF9BA8AB), width: 1.4),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.error, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.error, width: 2.0),
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF253745)),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.border),
       ),
+      errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
+      constraints: const BoxConstraints(minHeight: 54),
     );
   }
 
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
         style: const TextStyle(
-          color: Color(0xFFCCD0CF),
-          fontSize: 14,
+          color: AppColors.textPrimary,
+          fontSize: 15,
           fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
       ),
     );
