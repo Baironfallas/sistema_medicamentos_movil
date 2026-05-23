@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_service.dart';
 import '../../models/auth_user.dart';
 
@@ -22,14 +23,35 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Cerrar sesion'),
-          content: const Text('Deseas salir de tu cuenta?'),
+          backgroundColor: AppColors.surface,
+          surfaceTintColor: Colors.transparent,
+          title: const Text(
+            'Cerrar sesion',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: const Text(
+            'Deseas salir de tu cuenta?',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ),
             FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.surface,
+              ),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Salir'),
             ),
@@ -78,16 +100,18 @@ class _HomePageState extends State<HomePage> {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom + 40;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF06141B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF06141B),
-        foregroundColor: const Color(0xFFCCD0CF),
-        elevation: 0,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 1,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.border.withValues(alpha: 0.1),
         titleSpacing: 20,
         title: const Text(
           'Sistema de Medicamentos',
           style: TextStyle(
-            color: Color(0xFFCCD0CF),
+            color: AppColors.textPrimary,
             fontSize: 19,
             fontWeight: FontWeight.w700,
           ),
@@ -102,10 +126,10 @@ class _HomePageState extends State<HomePage> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFFCCD0CF),
+                      color: AppColors.primary,
                     ),
                   )
-                : const Icon(Icons.logout_outlined, color: Color(0xFFCCD0CF)),
+                : const Icon(Icons.logout_outlined, color: AppColors.textSecondary),
           ),
           const SizedBox(width: 8),
         ],
@@ -116,35 +140,7 @@ class _HomePageState extends State<HomePage> {
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF06141B),
-                  Color(0xFF11212D),
-                  Color(0xFF253745),
-                  Color(0xFF4A5C6A),
-                ],
-                stops: [0.0, 0.38, 0.72, 1.0],
-              ),
-            ),
-          ),
-          const Positioned(
-            top: -70,
-            right: -80,
-            child: _AmbientShape(
-              size: 220,
-              color: Color(0xFF4A5C6A),
-              opacity: 0.18,
-            ),
-          ),
-          const Positioned(
-            bottom: 80,
-            left: -90,
-            child: _AmbientShape(
-              size: 260,
-              color: Color(0xFF253745),
-              opacity: 0.30,
+              color: AppColors.background,
             ),
           ),
           SafeArea(
@@ -172,20 +168,17 @@ class _HomePageState extends State<HomePage> {
                                 vertical: 28,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF11212D,
-                                ).withValues(alpha: 0.78),
-                                borderRadius: BorderRadius.circular(28),
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(24),
                                 border: Border.all(
-                                  color: const Color(
-                                    0xFFCCD0CF,
-                                  ).withValues(alpha: 0.12),
+                                  color: AppColors.border,
+                                  width: 1.0,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.34),
-                                    blurRadius: 34,
-                                    offset: const Offset(0, 16),
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
@@ -200,24 +193,22 @@ class _HomePageState extends State<HomePage> {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          Color(0xFF4A5C6A),
-                                          Color(0xFF9BA8AB),
+                                          AppColors.primary,
+                                          Color(0xFF5EEAD4),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(26),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(
-                                            0xFF4A5C6A,
-                                          ).withValues(alpha: 0.28),
-                                          blurRadius: 24,
-                                          offset: const Offset(0, 10),
+                                          color: AppColors.primary.withValues(alpha: 0.2),
+                                          blurRadius: 16,
+                                          offset: const Offset(0, 6),
                                         ),
                                       ],
                                     ),
                                     child: const Icon(
                                       Icons.medication_liquid_outlined,
-                                      color: Color(0xFFCCD0CF),
+                                      color: AppColors.surface,
                                       size: 40,
                                     ),
                                   ),
@@ -231,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                                         .textTheme
                                         .headlineSmall
                                         ?.copyWith(
-                                          color: Color(0xFFCCD0CF),
+                                          color: AppColors.textPrimary,
                                           fontWeight: FontWeight.w800,
                                           height: 1.18,
                                         ),
@@ -242,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context).textTheme.bodyLarge
                                         ?.copyWith(
-                                          color: const Color(0xFF9BA8AB),
+                                          color: AppColors.textSecondary,
                                           fontWeight: FontWeight.w500,
                                           height: 1.45,
                                         ),
@@ -255,21 +246,18 @@ class _HomePageState extends State<HomePage> {
                                       vertical: 14,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF06141B,
-                                      ).withValues(alpha: 0.56),
-                                      borderRadius: BorderRadius.circular(18),
+                                      color: AppColors.background,
+                                      borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: const Color(
-                                          0xFF253745,
-                                        ).withValues(alpha: 0.9),
+                                        color: AppColors.border,
+                                        width: 1.0,
                                       ),
                                     ),
                                     child: const Row(
                                       children: [
                                         Icon(
                                           Icons.notifications_active_outlined,
-                                          color: Color(0xFFCCD0CF),
+                                          color: AppColors.primary,
                                           size: 24,
                                         ),
                                         SizedBox(width: 12),
@@ -277,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                                           child: Text(
                                             'Tu espacio de salud esta listo para usar.',
                                             style: TextStyle(
-                                              color: Color(0xFFCCD0CF),
+                                              color: AppColors.textPrimary,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
                                               height: 1.35,
@@ -296,13 +284,27 @@ class _HomePageState extends State<HomePage> {
                                           MedicineReminderApp.medicationsRoute,
                                         );
                                       },
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: AppColors.surface,
+                                        minimumSize: const Size(double.infinity, 56),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
+                                        ),
+                                      ),
                                       icon: const Icon(
                                         Icons.medication_outlined,
                                       ),
-                                      label: const Text('Mis medicamentos'),
+                                      label: const Text(
+                                        'Mis medicamentos',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 12),
                                   SizedBox(
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
@@ -311,10 +313,27 @@ class _HomePageState extends State<HomePage> {
                                           MedicineReminderApp.todayIntakesRoute,
                                         );
                                       },
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.textPrimary,
+                                        side: const BorderSide(
+                                          color: AppColors.border,
+                                          width: 1.5,
+                                        ),
+                                        minimumSize: const Size(double.infinity, 56),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
+                                        ),
+                                      ),
                                       icon: const Icon(
                                         Icons.notifications_active_outlined,
                                       ),
-                                      label: const Text('Tomas de hoy'),
+                                      label: const Text(
+                                        'Tomas de hoy',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -330,37 +349,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AmbientShape extends StatelessWidget {
-  const _AmbientShape({
-    required this.size,
-    required this.color,
-    required this.opacity,
-  });
-
-  final double size;
-  final Color color;
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color.withValues(alpha: opacity),
-            color.withValues(alpha: opacity * 0.35),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.45, 1.0],
-        ),
       ),
     );
   }
