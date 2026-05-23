@@ -7,6 +7,7 @@ import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/medications/presentation/pages/medication_list_page.dart';
 import 'features/medications/presentation/pages/today_intakes_page.dart';
+import 'features/medications/services/intake_notification_manager.dart';
 
 class MedicineReminderApp extends StatelessWidget {
   const MedicineReminderApp({super.key});
@@ -44,8 +45,30 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   final AuthStorage _authStorage = AuthStorage();
+  final IntakeNotificationManager _notificationManager =
+      IntakeNotificationManager();
 
   late final Future<bool> _hasSession = _authStorage.hasSession();
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeNotifications();
+  }
+
+  @override
+  void dispose() {
+    _notificationManager.stop();
+    super.dispose();
+  }
+
+  Future<void> _initializeNotifications() async {
+    final hasSession = await _hasSession;
+    if (hasSession && mounted) {
+      // Iniciar las notificaciones cuando el usuario está autenticado
+      await _notificationManager.start();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

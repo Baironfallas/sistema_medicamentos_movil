@@ -7,6 +7,8 @@ class MedicationIntake {
     required this.isConfirmed,
     this.timeLabel,
     this.dateLabel,
+    this.scheduledAt,
+    this.dosage,
   });
 
   final int id;
@@ -16,6 +18,8 @@ class MedicationIntake {
   final bool isConfirmed;
   final String? timeLabel;
   final String? dateLabel;
+  final String? scheduledAt;
+  final String? dosage;
 
   factory MedicationIntake.fromJson(Map<String, dynamic> json) {
     final id = _toInt(json['intakeId'] ?? json['id']);
@@ -65,6 +69,12 @@ class MedicationIntake {
     final timeLabel = hour ?? _timeFromIso(scheduledAt);
     final dateLabel = date ?? _dateFromIso(scheduledAt);
 
+    final dosage =
+        _string(json['dosage']) ??
+        _string(json['dose']) ??
+        _string(medicationMap['dosage']) ??
+        _string(medicationMap['dose']);
+
     return MedicationIntake(
       id: id,
       medicationId: _toIntNullable(
@@ -79,6 +89,8 @@ class MedicationIntake {
       isConfirmed: isConfirmed,
       timeLabel: timeLabel,
       dateLabel: dateLabel,
+      scheduledAt: scheduledAt,
+      dosage: dosage,
     );
   }
 
@@ -89,6 +101,8 @@ class MedicationIntake {
     String? status,
     String? timeLabel,
     String? dateLabel,
+    String? scheduledAt,
+    String? dosage,
   }) {
     return MedicationIntake(
       id: id,
@@ -98,6 +112,8 @@ class MedicationIntake {
       isConfirmed: isConfirmed ?? this.isConfirmed,
       timeLabel: timeLabel ?? this.timeLabel,
       dateLabel: dateLabel ?? this.dateLabel,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      dosage: dosage ?? this.dosage,
     );
   }
 }
