@@ -284,9 +284,7 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
-                      decoration: _fieldDecoration(
-                        'Fecha de inicio',
-                      ).copyWith(
+                      decoration: _fieldDecoration('Fecha de inicio').copyWith(
                         suffixIcon: const Icon(
                           Icons.event,
                           color: AppColors.textSecondary,
@@ -405,10 +403,7 @@ class _MedicationFormPageState extends State<MedicationFormPage> {
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
-      hintStyle: const TextStyle(
-        color: AppColors.textSecondary,
-        fontSize: 14,
-      ),
+      hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
