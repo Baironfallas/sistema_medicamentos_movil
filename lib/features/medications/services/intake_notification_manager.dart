@@ -32,7 +32,9 @@ class IntakeNotificationManager {
     if (_isRunning) return;
 
     _isRunning = true;
-    debugPrint('[IntakeNotificationManager] Iniciando gestor de notificaciones');
+    debugPrint(
+      '[IntakeNotificationManager] Iniciando gestor de notificaciones',
+    );
 
     // Ejecutar la primera verificación inmediatamente
     await _checkAndNotifyPendingIntakes();
@@ -47,13 +49,15 @@ class IntakeNotificationManager {
   Future<void> stop() async {
     _pollingTimer?.cancel();
     _isRunning = false;
-    debugPrint('[IntakeNotificationManager] Deteniendo gestor de notificaciones');
+    debugPrint(
+      '[IntakeNotificationManager] Deteniendo gestor de notificaciones',
+    );
   }
 
   Future<void> _checkAndNotifyPendingIntakes() async {
     try {
-      final List<MedicationIntake> todayIntakes =
-          await _medicationService.getTodayIntakes();
+      final List<MedicationIntake> todayIntakes = await _medicationService
+          .getTodayIntakes();
 
       final now = DateTime.now();
 
@@ -79,8 +83,9 @@ class IntakeNotificationManager {
         }
 
         // Calcular cuándo mostrar la notificación
-        final notificationTime = scheduledDateTime
-            .subtract(Duration(minutes: _notificationAdvanceMinutes));
+        final notificationTime = scheduledDateTime.subtract(
+          Duration(minutes: _notificationAdvanceMinutes),
+        );
 
         // Si es hora de notificar (dentro de una ventana de 2 minutos)
         if (now.isAfter(notificationTime) &&
@@ -90,9 +95,7 @@ class IntakeNotificationManager {
         }
       }
     } catch (error) {
-      debugPrint(
-        '[IntakeNotificationManager] Error verificando tomas: $error',
-      );
+      debugPrint('[IntakeNotificationManager] Error verificando tomas: $error');
     }
   }
 

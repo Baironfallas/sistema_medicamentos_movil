@@ -25,10 +25,10 @@ class LocalNotificationService {
     // Inicialización iOS
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
     final InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
@@ -51,22 +51,22 @@ class LocalNotificationService {
   }) async {
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'medication_reminders',
-      'Recordatorios de Medicamentos',
-      channelDescription:
-          'Notificaciones para recordar tomar medicamentos a tiempo',
-      importance: Importance.high,
-      priority: Priority.high,
-      showWhen: true,
-      enableVibration: true,
-    );
+          'medication_reminders',
+          'Recordatorios de Medicamentos',
+          channelDescription:
+              'Notificaciones para recordar tomar medicamentos a tiempo',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+          enableVibration: true,
+        );
 
     final DarwinNotificationDetails iosDetails =
         const DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
 
     final NotificationDetails details = NotificationDetails(
       android: androidDetails,
@@ -74,7 +74,8 @@ class LocalNotificationService {
     );
 
     final String title = '💊 Hora de tomar medicamento';
-    final String body = '$medicationName'
+    final String body =
+        '$medicationName'
         '${dosage != null ? ' - $dosage' : ''}'
         '\n'
         'Programado: $scheduledTime';
