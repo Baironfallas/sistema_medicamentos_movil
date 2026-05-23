@@ -130,10 +130,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return AuthFormLayout(
-      title: 'Sistema Inteligente para Recordar Medicamentos',
+      title: 'Medora',
       subtitle: 'Tu salud organizada en un solo lugar',
       welcomeText: 'Bienvenido de nuevo',
-      supportingText: 'Cuida tu salud de forma simple y segura.',
+      supportingText:
+          'Organiza tus tratamientos y mantén el control de tu salud.',
       headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
       headerHeight: 102,
