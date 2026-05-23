@@ -108,12 +108,20 @@ class MedicationController extends ChangeNotifier {
   }
 
   Future<bool> confirmIntake(int intakeId) async {
+    return updateIntakeStatus(intakeId, 'taken');
+  }
+
+  Future<bool> omitIntake(int intakeId) async {
+    return updateIntakeStatus(intakeId, 'omitted');
+  }
+
+  Future<bool> updateIntakeStatus(int intakeId, String status) async {
     isConfirming = true;
     intakesError = null;
     notifyListeners();
 
     try {
-      await _service.confirmIntake(intakeId);
+      await _service.confirmIntake(intakeId, status: status);
       await loadTodayIntakes();
       return true;
     } catch (error) {

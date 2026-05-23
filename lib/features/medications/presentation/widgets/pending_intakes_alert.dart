@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../models/medication_intake.dart';
 import '../controllers/medication_controller.dart';
@@ -22,7 +24,6 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
     super.initState();
     _controller = MedicationController();
     _loadIntakes = _controller.loadTodayIntakes();
-    // Auto-refresh cada 30 segundos para mostrar alertas automáticamente
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _controller.loadTodayIntakes();
     });
@@ -35,20 +36,26 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
     super.dispose();
   }
 
-  Future<void> _confirmIntake(MedicationIntake intake) async {
-    final success = await _controller.confirmIntake(intake.id);
+  Future<void> _updateIntakeStatus(
+    MedicationIntake intake,
+    String status,
+  ) async {
+    final success = await _controller.updateIntakeStatus(intake.id, status);
     if (!mounted) {
       return;
     }
 
     if (success) {
+      final statusLabel = status == 'taken' ? 'tomada' : 'omitida';
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('${intake.medicationName} confirmada'),
+            content: Text('${intake.medicationName} marcada como $statusLabel'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.success,
+            backgroundColor: status == 'taken'
+                ? AppColors.success
+                : AppColors.error,
           ),
         );
     } else if (_controller.intakesError != null) {
@@ -72,17 +79,15 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
         return ListenableBuilder(
           listenable: _controller,
           builder: (context, child) {
-            // Estado de carga
             if (_controller.isLoadingIntakes) {
-              return Column(
-                children: const [
+              return const Column(
+                children: [
                   SizedBox(height: 16),
                   LinearProgressIndicator(),
                 ],
               );
             }
 
-            // Error al cargar
             if (_controller.intakesError != null) {
               return Column(
                 children: [
@@ -108,7 +113,6 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                 .toList();
 
             if (pendingIntakes.isEmpty) {
-              // Mostrar un botón pequeño para forzar recarga (útil para debug)
               return Column(
                 children: [
                   const SizedBox(height: 8),
@@ -188,7 +192,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '⏰ Medicamentos por tomar',
+                      'Medicamentos por tomar',
                       style: TextStyle(
                         color: AppColors.warning,
                         fontSize: 13,
@@ -251,7 +255,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                 if (intakes.length > 1) ...[
                   const SizedBox(height: 8),
                   Text(
-                    '+ ${intakes.length - 1} más',
+                    '+ ${intakes.length - 1} mas',
                     style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
@@ -264,37 +268,63 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
             ),
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.warning,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: BorderSide(
+                      color: AppColors.error.withValues(alpha: 0.5),
+                    ),
+                    minimumSize: const Size(0, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _controller.isConfirming
+                      ? null
+                      : () => _updateIntakeStatus(firstIntake, 'omitted'),
+                  icon: const Icon(Icons.cancel_outlined),
+                  label: const Text('Omitida'),
                 ),
               ),
-              onPressed: _controller.isConfirming
-                  ? null
-                  : () => _confirmIntake(firstIntake),
-              child: _controller.isConfirming
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Text(
-                      '✓ Confirmar toma',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.warning,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-            ),
+                  ),
+                  onPressed: _controller.isConfirming
+                      ? null
+                      : () => _updateIntakeStatus(firstIntake, 'taken'),
+                  icon: _controller.isConfirming
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Icon(Icons.check_circle_outline),
+                  label: const Text(
+                    'Tomada',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

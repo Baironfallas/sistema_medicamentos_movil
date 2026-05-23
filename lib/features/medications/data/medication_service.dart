@@ -150,6 +150,10 @@ class MedicationService {
   }
 
   Future<void> confirmIntake(int intakeId, {String status = 'taken'}) async {
+    if (status != 'taken' && status != 'omitted') {
+      throw const MedicationException('Estado de toma no valido.');
+    }
+
     return _guard(() async {
       final response = await _client
           .patch(

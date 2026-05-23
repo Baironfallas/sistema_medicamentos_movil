@@ -1,4 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '../../features/medications/data/medication_service.dart';
+
+const String _medicationTakenActionId = 'medication_taken';
+const String _medicationOmittedActionId = 'medication_omitted';
+const String _medicationIntakeCategoryId = 'medication_intake_actions';
+
+@pragma('vm:entry-point')
+void medicationNotificationBackgroundHandler(NotificationResponse response) {
+  LocalNotificationService.handleNotificationResponse(response);
+}
 
 class LocalNotificationService {
   static final LocalNotificationService _instance =
@@ -18,16 +30,34 @@ class LocalNotificationService {
 
     _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // Inicialización Android
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // Inicialización iOS
-    const DarwinInitializationSettings iosSettings =
+    final DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
           requestSoundPermission: true,
+          notificationCategories: [
+            DarwinNotificationCategory(
+              _medicationIntakeCategoryId,
+              actions: [
+                DarwinNotificationAction.plain(
+                  _medicationTakenActionId,
+                  'Tomada',
+                  options: {DarwinNotificationActionOption.foreground},
+                ),
+                DarwinNotificationAction.plain(
+                  _medicationOmittedActionId,
+                  'Omitida',
+                  options: {
+                    DarwinNotificationActionOption.destructive,
+                    DarwinNotificationActionOption.foreground,
+                  },
+                ),
+              ],
+            ),
+          ],
         );
 
     final InitializationSettings initSettings = InitializationSettings(
@@ -38,6 +68,8 @@ class LocalNotificationService {
     await _notificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onSelectNotification,
+      onDidReceiveBackgroundNotificationResponse:
+          medicationNotificationBackgroundHandler,
     );
 
     _isInitialized = true;
@@ -59,6 +91,20 @@ class LocalNotificationService {
           priority: Priority.high,
           showWhen: true,
           enableVibration: true,
+          actions: const [
+            AndroidNotificationAction(
+              _medicationTakenActionId,
+              'Tomada',
+              showsUserInterface: true,
+              cancelNotification: true,
+            ),
+            AndroidNotificationAction(
+              _medicationOmittedActionId,
+              'Omitida',
+              showsUserInterface: true,
+              cancelNotification: true,
+            ),
+          ],
         );
 
     final DarwinNotificationDetails iosDetails =
@@ -66,6 +112,7 @@ class LocalNotificationService {
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          categoryIdentifier: _medicationIntakeCategoryId,
         );
 
     final NotificationDetails details = NotificationDetails(
@@ -73,7 +120,7 @@ class LocalNotificationService {
       iOS: iosDetails,
     );
 
-    final String title = '💊 Hora de tomar medicamento';
+    final String title = 'Hora de tomar medicamento';
     final String body =
         '$medicationName'
         '${dosage != null ? ' - $dosage' : ''}'
@@ -100,6 +147,50 @@ class LocalNotificationService {
   static Future<void> _onSelectNotification(
     NotificationResponse response,
   ) async {
-    // Manejador cuando el usuario toca la notificación
+    await handleNotificationResponse(response);
+  }
+
+  static Future<void> handleNotificationResponse(
+    NotificationResponse response,
+  ) async {
+    final actionStatus = _statusFromAction(response.actionId);
+    if (actionStatus == null) {
+      return;
+    }
+
+    final intakeId = _intakeIdFromPayload(response.payload);
+    if (intakeId == null) {
+      debugPrint(
+        '[LocalNotificationService] Payload invalido: ${response.payload}',
+      );
+      return;
+    }
+
+    try {
+      await MedicationService().confirmIntake(intakeId, status: actionStatus);
+      debugPrint(
+        '[LocalNotificationService] Toma $intakeId marcada como $actionStatus',
+      );
+    } catch (error, stackTrace) {
+      debugPrint(
+        '[LocalNotificationService] Error actualizando toma $intakeId: $error',
+      );
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  static String? _statusFromAction(String? actionId) {
+    return switch (actionId) {
+      _medicationTakenActionId => 'taken',
+      _medicationOmittedActionId => 'omitted',
+      _ => null,
+    };
+  }
+
+  static int? _intakeIdFromPayload(String? payload) {
+    if (payload == null || !payload.startsWith('intake_')) {
+      return null;
+    }
+    return int.tryParse(payload.substring('intake_'.length));
   }
 }

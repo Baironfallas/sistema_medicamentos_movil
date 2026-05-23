@@ -77,7 +77,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
   Widget _buildIntakeCard(MedicationIntake intake) {
     final status = intake.status.toLowerCase();
     final statusLabel = status == 'taken'
-        ? 'Confirmada'
+        ? 'Tomada'
         : status == 'omitted'
         ? 'Omitida'
         : 'Pendiente';
@@ -164,19 +164,38 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
           ),
           if (intake.canConfirm) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.surface,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    onPressed: _controller.isConfirming
+                        ? null
+                        : () => _updateIntakeStatus(intake, 'omitted'),
+                    icon: const Icon(Icons.cancel_outlined),
+                    label: const Text('Omitida'),
+                  ),
                 ),
-                onPressed: _controller.isConfirming
-                    ? null
-                    : () => _confirmIntake(intake),
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Confirmar toma'),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.surface,
+                    ),
+                    onPressed: _controller.isConfirming
+                        ? null
+                        : () => _updateIntakeStatus(intake, 'taken'),
+                    icon: const Icon(Icons.check_circle_outline),
+                    label: const Text('Tomada'),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -184,8 +203,11 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
     );
   }
 
-  Future<void> _confirmIntake(MedicationIntake intake) async {
-    final success = await _controller.confirmIntake(intake.id);
+  Future<void> _updateIntakeStatus(
+    MedicationIntake intake,
+    String status,
+  ) async {
+    final success = await _controller.updateIntakeStatus(intake.id, status);
     if (!mounted) {
       return;
     }
@@ -197,6 +219,22 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
           SnackBar(
             content: Text(_controller.intakesError!),
             behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+
+    if (success) {
+      final statusLabel = status == 'taken' ? 'tomada' : 'omitida';
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('${intake.medicationName} marcada como $statusLabel'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: status == 'taken'
+                ? AppColors.success
+                : AppColors.error,
           ),
         );
     }
