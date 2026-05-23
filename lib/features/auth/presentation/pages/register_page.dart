@@ -276,9 +276,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ? 'Mostrar contraseña'
               : 'Ocultar contraseña',
           onPressed: () {
-            setState(
-              () => _obscureConfirmPassword = !_obscureConfirmPassword,
-            );
+            setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
           },
           icon: Icon(
             _obscureConfirmPassword
@@ -451,9 +449,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.primary,
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       onPressed: _isLoading
                           ? null

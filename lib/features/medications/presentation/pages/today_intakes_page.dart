@@ -90,7 +90,9 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
       decoration: BoxDecoration(
         color: const Color(0xFF11212D).withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF253745).withValues(alpha: 0.8)),
+        border: Border.all(
+          color: const Color(0xFF253745).withValues(alpha: 0.8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
