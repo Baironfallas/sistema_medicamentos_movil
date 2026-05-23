@@ -145,12 +145,12 @@ class _MedicationListPageState extends State<MedicationListPage> {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF11212D).withOpacity(0.85),
+        color: const Color(0xFF11212D).withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF253745).withOpacity(0.8)),
+        border: Border.all(color: const Color(0xFF253745).withValues(alpha: 0.8)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),

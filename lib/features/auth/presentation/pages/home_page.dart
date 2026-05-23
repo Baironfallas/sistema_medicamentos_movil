@@ -174,16 +174,16 @@ class _HomePageState extends State<HomePage> {
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFF11212D,
-                                ).withOpacity(0.78),
+                                ).withValues(alpha: 0.78),
                                 borderRadius: BorderRadius.circular(28),
                                 border: Border.all(
                                   color: const Color(
                                     0xFFCCD0CF,
-                                  ).withOpacity(0.12),
+                                  ).withValues(alpha: 0.12),
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.34),
+                                    color: Colors.black.withValues(alpha: 0.34),
                                     blurRadius: 34,
                                     offset: const Offset(0, 16),
                                   ),
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                                         BoxShadow(
                                           color: const Color(
                                             0xFF4A5C6A,
-                                          ).withOpacity(0.28),
+                                          ).withValues(alpha: 0.28),
                                           blurRadius: 24,
                                           offset: const Offset(0, 10),
                                         ),
@@ -257,12 +257,12 @@ class _HomePageState extends State<HomePage> {
                                     decoration: BoxDecoration(
                                       color: const Color(
                                         0xFF06141B,
-                                      ).withOpacity(0.56),
+                                      ).withValues(alpha: 0.56),
                                       borderRadius: BorderRadius.circular(18),
                                       border: Border.all(
                                         color: const Color(
                                           0xFF253745,
-                                        ).withOpacity(0.9),
+                                        ).withValues(alpha: 0.9),
                                       ),
                                     ),
                                     child: const Row(
@@ -355,8 +355,8 @@ class _AmbientShape extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            color.withOpacity(opacity),
-            color.withOpacity(opacity * 0.35),
+            color.withValues(alpha: opacity),
+            color.withValues(alpha: opacity * 0.35),
             Colors.transparent,
           ],
           stops: const [0.0, 0.45, 1.0],

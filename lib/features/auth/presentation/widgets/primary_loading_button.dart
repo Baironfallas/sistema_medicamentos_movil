@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class PrimaryLoadingButton extends StatelessWidget {
   const PrimaryLoadingButton({
     super.key,
@@ -27,7 +29,7 @@ class PrimaryLoadingButton extends StatelessWidget {
           gradient: LinearGradient(
             colors:
                 gradientColors ??
-                const [Color(0xFF4A5C6A), Color(0xFF9BA8AB)],
+                const [AppColors.primary, AppColors.primary],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
