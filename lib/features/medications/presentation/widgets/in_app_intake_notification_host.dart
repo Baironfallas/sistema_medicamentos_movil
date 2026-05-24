@@ -16,6 +16,8 @@ class _InAppIntakeNotificationHostState
     extends State<InAppIntakeNotificationHost> {
   final IntakeNotificationManager _manager = IntakeNotificationManager();
   final Set<int> _updatingIntakeIds = {};
+  static const Color _softPrimary = Color(0xFFCCFBF1);
+  static const Color _timePillBackground = Color(0xFFF1F5F9);
 
   Future<void> _updateStatus(MedicationIntake intake, String status) async {
     setState(() => _updatingIntakeIds.add(intake.id));
@@ -126,13 +128,13 @@ class _InAppIntakeNotificationHostState
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: AppColors.warning.withValues(alpha: 0.24),
+                color: _softPrimary,
                 width: 1.0,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 20,
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  blurRadius: 22,
                   offset: const Offset(0, 8),
                 ),
               ],
@@ -154,12 +156,12 @@ class _InAppIntakeNotificationHostState
                             width: 34,
                             height: 34,
                             decoration: BoxDecoration(
-                              color: AppColors.warning.withValues(alpha: 0.12),
+                              color: _softPrimary,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.notifications_active_outlined,
-                              color: AppColors.warning,
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -231,9 +233,9 @@ class _InAppIntakeNotificationHostState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: _timePillBackground,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -262,7 +264,8 @@ class _InAppIntakeNotificationHostState
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.error,
-        side: BorderSide(color: AppColors.error.withValues(alpha: 0.42)),
+        backgroundColor: AppColors.surface,
+        side: BorderSide(color: AppColors.error.withValues(alpha: 0.34)),
         minimumSize: const Size(0, 38),
         padding: const EdgeInsets.symmetric(horizontal: 10),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -280,7 +283,7 @@ class _InAppIntakeNotificationHostState
   Widget _buildTakenButton(MedicationIntake intake, bool isUpdating) {
     return FilledButton.icon(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.warning,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         minimumSize: const Size(0, 38),
         padding: const EdgeInsets.symmetric(horizontal: 10),
