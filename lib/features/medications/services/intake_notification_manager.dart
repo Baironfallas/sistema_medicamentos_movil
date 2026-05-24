@@ -105,7 +105,7 @@ class IntakeNotificationManager extends ChangeNotifier {
       final dueChanged = _updateDuePendingIntakes(todayIntakes, now);
       _scheduleNextDueRefresh(todayIntakes, now);
 
-      _removeResolvedInAppAlerts(todayIntakes);
+      _removeResolvedInAppAlerts(todayIntakes, now);
 
       if (usesInAppAlerts) {
         _syncInAppAlerts(todayIntakes, now);
@@ -248,20 +248,26 @@ class IntakeNotificationManager extends ChangeNotifier {
     }
   }
 
-  void _removeResolvedInAppAlerts(List<MedicationIntake> todayIntakes) {
-    if (_inAppAlertsById.isEmpty) {
+  void _removeResolvedInAppAlerts(
+    List<MedicationIntake> todayIntakes,
+    DateTime now,
+  ) {
+    if (_inAppAlertsById.isEmpty && _shownInAppIntakeIds.isEmpty) {
       return;
     }
 
-    final pendingIds = todayIntakes
-        .where((intake) => intake.status.toLowerCase() == 'pending')
+    final duePendingIds = todayIntakes
+        .where((intake) => _isPendingDue(intake, now))
         .map((intake) => intake.id)
         .toSet();
 
     final beforeCount = _inAppAlertsById.length;
-    _inAppAlertsById.removeWhere((id, _) => !pendingIds.contains(id));
+    final beforeShownCount = _shownInAppIntakeIds.length;
+    _inAppAlertsById.removeWhere((id, _) => !duePendingIds.contains(id));
+    _shownInAppIntakeIds.removeWhere((id) => !duePendingIds.contains(id));
 
-    if (_inAppAlertsById.length != beforeCount) {
+    if (_inAppAlertsById.length != beforeCount ||
+        _shownInAppIntakeIds.length != beforeShownCount) {
       notifyListeners();
     }
   }
