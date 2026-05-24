@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../models/medication_intake.dart';
-import '../controllers/medication_controller.dart';
+import '../../services/intake_notification_manager.dart';
 import 'info_banner.dart';
 
 class PendingIntakesAlert extends StatefulWidget {
@@ -13,19 +13,17 @@ class PendingIntakesAlert extends StatefulWidget {
 }
 
 class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
-  late final MedicationController _controller;
-  late final Future<void> _loadIntakes;
+  final IntakeNotificationManager _manager = IntakeNotificationManager();
+  final Set<int> _updatingIntakeIds = {};
 
   @override
   void initState() {
     super.initState();
-    _controller = MedicationController();
-    _loadIntakes = _controller.loadTodayIntakes();
+    _manager.start();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -33,30 +31,35 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
     MedicationIntake intake,
     String status,
   ) async {
-    final success = await _controller.updateIntakeStatus(intake.id, status);
+    setState(() => _updatingIntakeIds.add(intake.id));
+
+    final success = await _manager.updateIntakeStatus(intake, status);
     if (!mounted) {
       return;
     }
 
+    setState(() => _updatingIntakeIds.remove(intake.id));
+
     if (success) {
       final statusLabel = status == 'taken' ? 'tomada' : 'omitida';
+      final medicationName = _displayMedicationName(intake);
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
-            content: Text('${intake.medicationName} marcada como $statusLabel'),
+            content: Text('$medicationName marcada como $statusLabel'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: status == 'taken'
                 ? AppColors.success
                 : AppColors.error,
           ),
         );
-    } else if (_controller.intakesError != null) {
+    } else {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          SnackBar(
-            content: Text(_controller.intakesError!),
+          const SnackBar(
+            content: Text('No se pudo actualizar la toma. Intenta de nuevo.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -66,56 +69,49 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _loadIntakes,
-      builder: (context, snapshot) {
-        return ListenableBuilder(
-          listenable: _controller,
-          builder: (context, child) {
-            if (_controller.isLoadingIntakes) {
-              return const Column(
-                children: [
-                  SizedBox(height: 16),
-                  LinearProgressIndicator(),
-                ],
-              );
-            }
+    return ListenableBuilder(
+      listenable: _manager,
+      builder: (context, child) {
+        if (!_manager.hasLoadedTodayIntakes) {
+          return const Column(
+            children: [
+              SizedBox(height: 16),
+              LinearProgressIndicator(),
+            ],
+          );
+        }
 
-            if (_controller.intakesError != null) {
-              return Column(
+        if (_manager.todayIntakesError != null) {
+          return Column(
+            children: [
+              const SizedBox(height: 16),
+              InfoBanner(message: _manager.todayIntakesError!),
+              const SizedBox(height: 8),
+              Row(
                 children: [
-                  const SizedBox(height: 16),
-                  InfoBanner(message: _controller.intakesError!),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _controller.loadTodayIntakes(),
-                          child: const Text('Reintentar'),
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _manager.refreshScheduledNotifications,
+                      child: const Text('Reintentar'),
+                    ),
                   ),
                 ],
-              );
-            }
+              ),
+            ],
+          );
+        }
 
-            final pendingIntakes = _controller.todayIntakes
-                .where((intake) => intake.status.toLowerCase() == 'pending')
-                .toList();
+        final pendingIntakes = _manager.duePendingIntakes;
 
-            if (pendingIntakes.isEmpty) {
-              return const SizedBox(height: 8);
-            }
+        if (pendingIntakes.isEmpty) {
+          return const SizedBox(height: 8);
+        }
 
-            return Column(
-              children: [
-                const SizedBox(height: 16),
-                _buildPendingIntakesCard(pendingIntakes),
-              ],
-            );
-          },
+        return Column(
+          children: [
+            const SizedBox(height: 16),
+            _buildPendingIntakesCard(pendingIntakes),
+          ],
         );
       },
     );
@@ -123,6 +119,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
 
   Widget _buildPendingIntakesCard(List<MedicationIntake> intakes) {
     final firstIntake = intakes.first;
+    final isUpdating = _updatingIntakeIds.contains(firstIntake.id);
 
     return Container(
       width: double.infinity,
@@ -207,7 +204,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  firstIntake.medicationName,
+                  _displayMedicationName(firstIntake),
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15,
@@ -263,7 +260,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: _controller.isConfirming
+                  onPressed: isUpdating
                       ? null
                       : () => _updateIntakeStatus(firstIntake, 'omitted'),
                   icon: const Icon(Icons.cancel_outlined),
@@ -281,10 +278,10 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: _controller.isConfirming
+                  onPressed: isUpdating
                       ? null
                       : () => _updateIntakeStatus(firstIntake, 'taken'),
-                  icon: _controller.isConfirming
+                  icon: isUpdating
                       ? const SizedBox(
                           width: 16,
                           height: 16,
@@ -310,5 +307,13 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
         ],
       ),
     );
+  }
+
+  String _displayMedicationName(MedicationIntake intake) {
+    final name = intake.medicationName.trim();
+    if (name.isEmpty || name.startsWith('Toma #')) {
+      return 'Medicamento programado';
+    }
+    return name;
   }
 }

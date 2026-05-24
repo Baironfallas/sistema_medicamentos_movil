@@ -21,6 +21,8 @@ class MedicationIntake {
   final String? scheduledAt;
   final String? dosage;
 
+  DateTime? get scheduledDateTime => _dateTimeFromIso(scheduledAt);
+
   factory MedicationIntake.fromJson(Map<String, dynamic> json) {
     final id = _toInt(json['intakeId'] ?? json['id']);
     final medicationMap = _asMap(
@@ -66,8 +68,8 @@ class MedicationIntake {
         _string(json['scheduledDate']) ??
         _string(json['day']);
 
-    final timeLabel = hour ?? _timeFromIso(scheduledAt);
-    final dateLabel = date ?? _dateFromIso(scheduledAt);
+    final timeLabel = _timeFromIso(scheduledAt) ?? hour;
+    final dateLabel = _dateFromIso(scheduledAt) ?? date;
 
     final dosage =
         _string(json['dosage']) ??
@@ -172,17 +174,14 @@ String? _timeFromIso(String? iso) {
   if (iso == null || iso.isEmpty) {
     return null;
   }
-  final timePart = RegExp(r'\d{2}:\d{2}').firstMatch(iso)?.group(0);
-  if (timePart != null) {
-    return timePart;
-  }
-  final parsed = DateTime.tryParse(iso);
+
+  final parsed = _dateTimeFromIso(iso);
   if (parsed == null) {
-    return null;
+    return RegExp(r'\d{2}:\d{2}').firstMatch(iso)?.group(0);
   }
-  final local = parsed.toLocal();
-  final hour = local.hour.toString().padLeft(2, '0');
-  final minute = local.minute.toString().padLeft(2, '0');
+
+  final hour = parsed.hour.toString().padLeft(2, '0');
+  final minute = parsed.minute.toString().padLeft(2, '0');
   return '$hour:$minute';
 }
 
@@ -190,17 +189,55 @@ String? _dateFromIso(String? iso) {
   if (iso == null || iso.isEmpty) {
     return null;
   }
-  final datePart = RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(iso)?.group(0);
-  if (datePart != null) {
-    return datePart;
+
+  final parsed = _dateTimeFromIso(iso);
+  if (parsed == null) {
+    return RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(iso)?.group(0);
   }
-  final parsed = DateTime.tryParse(iso);
+
+  final year = parsed.year.toString().padLeft(4, '0');
+  final month = parsed.month.toString().padLeft(2, '0');
+  final day = parsed.day.toString().padLeft(2, '0');
+  return '$year-$month-$day';
+}
+
+DateTime? _dateTimeFromIso(String? iso) {
+  if (iso == null || iso.isEmpty) {
+    return null;
+  }
+
+  final value = iso.trim();
+  final parsed = DateTime.tryParse(value);
   if (parsed == null) {
     return null;
   }
-  final local = parsed.toLocal();
-  final year = local.year.toString().padLeft(4, '0');
-  final month = local.month.toString().padLeft(2, '0');
-  final day = local.day.toString().padLeft(2, '0');
-  return '$year-$month-$day';
+
+  if (parsed.isUtc || _hasTimeZoneOffset(value)) {
+    return parsed.toLocal();
+  }
+
+  // The backend stores MySQL DATETIME values and may serialize the UTC clock
+  // without an explicit Z. Treat scheduledAt date-times from the API as UTC.
+  if (_looksLikeBackendDateTime(value)) {
+    return DateTime.utc(
+      parsed.year,
+      parsed.month,
+      parsed.day,
+      parsed.hour,
+      parsed.minute,
+      parsed.second,
+      parsed.millisecond,
+      parsed.microsecond,
+    ).toLocal();
+  }
+
+  return parsed;
+}
+
+bool _hasTimeZoneOffset(String value) {
+  return RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(value);
+}
+
+bool _looksLikeBackendDateTime(String value) {
+  return RegExp(r'^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}').hasMatch(value);
 }

@@ -226,7 +226,7 @@ class LocalNotificationService {
       body,
       notificationDate,
       details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'intake_$id',
@@ -325,6 +325,7 @@ class LocalNotificationService {
         >();
 
     await androidImplementation?.requestNotificationsPermission();
+    await androidImplementation?.requestExactAlarmsPermission();
   }
 
   tz.TZDateTime _toLocalNotificationDate(DateTime dateTime) {

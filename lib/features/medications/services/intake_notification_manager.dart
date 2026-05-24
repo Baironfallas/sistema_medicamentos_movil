@@ -23,16 +23,18 @@ class IntakeNotificationManager extends ChangeNotifier {
       LocalNotificationService();
 
   Timer? _syncTimer;
-  Timer? _nextInAppTimer;
+  Timer? _nextDueTimer;
   final Set<int> _notifiedNowIntakeIds = {};
   final Set<int> _shownInAppIntakeIds = {};
+  final Set<int> _duePendingIntakeIds = {};
   final Map<int, MedicationIntake> _inAppAlertsById = {};
+  List<MedicationIntake> _todayIntakes = [];
+  String? _todayIntakesError;
+  bool _hasLoadedTodayIntakes = false;
   bool _isRunning = false;
 
   static const int _mobileSyncIntervalHours = 1;
   static const int _inAppSyncIntervalSeconds = 30;
-  static const int _notificationAdvanceMinutes = 0;
-
   NotificationDeliveryMode get deliveryMode {
     if (!kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.android ||
@@ -47,6 +49,18 @@ class IntakeNotificationManager extends ChangeNotifier {
 
   List<MedicationIntake> get inAppAlerts =>
       List.unmodifiable(_inAppAlertsById.values);
+
+  List<MedicationIntake> get todayIntakes => List.unmodifiable(_todayIntakes);
+
+  List<MedicationIntake> get duePendingIntakes {
+    return _todayIntakes
+        .where((intake) => _duePendingIntakeIds.contains(intake.id))
+        .toList();
+  }
+
+  String? get todayIntakesError => _todayIntakesError;
+
+  bool get hasLoadedTodayIntakes => _hasLoadedTodayIntakes;
 
   Future<void> start() async {
     if (_isRunning) return;
@@ -71,11 +85,12 @@ class IntakeNotificationManager extends ChangeNotifier {
   Future<void> stop() async {
     _syncTimer?.cancel();
     _syncTimer = null;
-    _nextInAppTimer?.cancel();
-    _nextInAppTimer = null;
+    _nextDueTimer?.cancel();
+    _nextDueTimer = null;
     _isRunning = false;
     _notifiedNowIntakeIds.clear();
     _shownInAppIntakeIds.clear();
+    _duePendingIntakeIds.clear();
     _clearInAppAlerts();
     debugPrint(
       '[IntakeNotificationManager] Deteniendo gestor de notificaciones',
@@ -86,32 +101,54 @@ class IntakeNotificationManager extends ChangeNotifier {
     try {
       final todayIntakes = await _medicationService.getTodayIntakes();
       final now = DateTime.now();
+      final intakesChanged = _setTodayIntakes(todayIntakes, error: null);
+      final dueChanged = _updateDuePendingIntakes(todayIntakes, now);
+      _scheduleNextDueRefresh(todayIntakes, now);
 
       _removeResolvedInAppAlerts(todayIntakes);
 
       if (usesInAppAlerts) {
         _syncInAppAlerts(todayIntakes, now);
+        if (intakesChanged || dueChanged) {
+          notifyListeners();
+        }
         return;
       }
 
       await _syncSystemNotifications(todayIntakes, now);
+      if (intakesChanged || dueChanged) {
+        notifyListeners();
+      }
     } catch (error) {
+      final message = error.toString();
+      final changed =
+          _todayIntakesError != message || !_hasLoadedTodayIntakes;
+      _todayIntakesError = message;
+      _hasLoadedTodayIntakes = true;
+      if (changed) {
+        notifyListeners();
+      }
       debugPrint(
         '[IntakeNotificationManager] Error sincronizando notificaciones: $error',
       );
     }
   }
 
-  Future<bool> respondToInAppAlert(
-    MedicationIntake intake,
-    String status,
-  ) async {
+  Future<bool> updateIntakeStatus(MedicationIntake intake, String status) async {
     if (status != 'taken' && status != 'omitted') {
       return false;
     }
 
     try {
       await _medicationService.confirmIntake(intake.id, status: status);
+      _todayIntakes = _todayIntakes
+          .map(
+            (item) => item.id == intake.id
+                ? item.copyWith(status: status, isConfirmed: true)
+                : item,
+          )
+          .toList();
+      _duePendingIntakeIds.remove(intake.id);
       _inAppAlertsById.remove(intake.id);
       _shownInAppIntakeIds.add(intake.id);
       _notifiedNowIntakeIds.add(intake.id);
@@ -121,10 +158,17 @@ class IntakeNotificationManager extends ChangeNotifier {
       return true;
     } catch (error) {
       debugPrint(
-        '[IntakeNotificationManager] Error respondiendo alerta interna: $error',
+        '[IntakeNotificationManager] Error actualizando toma: $error',
       );
       return false;
     }
+  }
+
+  Future<bool> respondToInAppAlert(
+    MedicationIntake intake,
+    String status,
+  ) async {
+    return updateIntakeStatus(intake, status);
   }
 
   Future<void> _syncSystemNotifications(
@@ -155,22 +199,14 @@ class IntakeNotificationManager extends ChangeNotifier {
         continue;
       }
 
-      final notificationTime = scheduledDateTime.subtract(
-        Duration(minutes: _notificationAdvanceMinutes),
-      );
-      final notificationWindowEnd = scheduledDateTime.add(
-        const Duration(minutes: 2),
-      );
-
-      if (notificationTime.isAfter(now)) {
+      if (scheduledDateTime.isAfter(now)) {
         if (!pendingNotificationIds.contains(intake.id)) {
-          await _scheduleNotification(intake, notificationTime);
+          await _scheduleNotification(intake, scheduledDateTime);
         }
         continue;
       }
 
-      if (now.isBefore(notificationWindowEnd) &&
-          !_notifiedNowIntakeIds.contains(intake.id)) {
+      if (!_notifiedNowIntakeIds.contains(intake.id)) {
         await _showNotification(intake);
         _notifiedNowIntakeIds.add(intake.id);
       }
@@ -179,7 +215,6 @@ class IntakeNotificationManager extends ChangeNotifier {
 
   void _syncInAppAlerts(List<MedicationIntake> todayIntakes, DateTime now) {
     var changed = false;
-    DateTime? nextNotificationTime;
 
     for (final intake in todayIntakes) {
       if (intake.status.toLowerCase() != 'pending') {
@@ -194,20 +229,12 @@ class IntakeNotificationManager extends ChangeNotifier {
         continue;
       }
 
-      final notificationTime = scheduledDateTime.subtract(
-        Duration(minutes: _notificationAdvanceMinutes),
-      );
-
       if (_shownInAppIntakeIds.contains(intake.id) ||
           _inAppAlertsById.containsKey(intake.id)) {
         continue;
       }
 
-      if (now.isBefore(notificationTime)) {
-        if (nextNotificationTime == null ||
-            notificationTime.isBefore(nextNotificationTime)) {
-          nextNotificationTime = notificationTime;
-        }
+      if (scheduledDateTime.isAfter(now)) {
         continue;
       }
 
@@ -216,26 +243,9 @@ class IntakeNotificationManager extends ChangeNotifier {
       changed = true;
     }
 
-    _scheduleNextInAppRefresh(nextNotificationTime);
-
     if (changed) {
       notifyListeners();
     }
-  }
-
-  void _scheduleNextInAppRefresh(DateTime? nextNotificationTime) {
-    _nextInAppTimer?.cancel();
-    _nextInAppTimer = null;
-
-    if (nextNotificationTime == null || !usesInAppAlerts) {
-      return;
-    }
-
-    final delay = nextNotificationTime.difference(DateTime.now());
-    _nextInAppTimer = Timer(
-      delay.isNegative ? Duration.zero : delay,
-      refreshScheduledNotifications,
-    );
   }
 
   void _removeResolvedInAppAlerts(List<MedicationIntake> todayIntakes) {
@@ -263,6 +273,96 @@ class IntakeNotificationManager extends ChangeNotifier {
 
     _inAppAlertsById.clear();
     notifyListeners();
+  }
+
+  bool _updateDuePendingIntakes(
+    List<MedicationIntake> intakes,
+    DateTime now,
+  ) {
+    final nextDueIds = intakes
+        .where((intake) => _isPendingDue(intake, now))
+        .map((intake) => intake.id)
+        .toSet();
+
+    if (setEquals(_duePendingIntakeIds, nextDueIds)) {
+      return false;
+    }
+
+    _duePendingIntakeIds
+      ..clear()
+      ..addAll(nextDueIds);
+    return true;
+  }
+
+  void _scheduleNextDueRefresh(
+    List<MedicationIntake> intakes,
+    DateTime now,
+  ) {
+    _nextDueTimer?.cancel();
+    _nextDueTimer = null;
+
+    DateTime? nextDueTime;
+    for (final intake in intakes) {
+      if (intake.status.toLowerCase() != 'pending') {
+        continue;
+      }
+
+      final scheduledDateTime = _scheduledDateTimeFor(intake);
+      if (scheduledDateTime == null || !scheduledDateTime.isAfter(now)) {
+        continue;
+      }
+
+      if (nextDueTime == null || scheduledDateTime.isBefore(nextDueTime)) {
+        nextDueTime = scheduledDateTime;
+      }
+    }
+
+    if (nextDueTime == null) {
+      return;
+    }
+
+    final delay = nextDueTime.difference(DateTime.now());
+    _nextDueTimer = Timer(
+      (delay.isNegative ? Duration.zero : delay) +
+          const Duration(milliseconds: 200),
+      refreshScheduledNotifications,
+    );
+  }
+
+  bool _setTodayIntakes(List<MedicationIntake> intakes, {String? error}) {
+    final changed =
+        !_hasLoadedTodayIntakes ||
+        _todayIntakesError != error ||
+        !_sameIntakeList(_todayIntakes, intakes);
+
+    _todayIntakes = List<MedicationIntake>.from(intakes);
+    _todayIntakesError = error;
+    _hasLoadedTodayIntakes = true;
+
+    return changed;
+  }
+
+  bool _sameIntakeList(
+    List<MedicationIntake> current,
+    List<MedicationIntake> next,
+  ) {
+    if (current.length != next.length) {
+      return false;
+    }
+
+    for (var index = 0; index < current.length; index += 1) {
+      final left = current[index];
+      final right = next[index];
+      if (left.id != right.id ||
+          left.status != right.status ||
+          left.scheduledAt != right.scheduledAt ||
+          left.medicationName != right.medicationName ||
+          left.timeLabel != right.timeLabel) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   Future<void> _scheduleNotification(
@@ -311,20 +411,27 @@ class IntakeNotificationManager extends ChangeNotifier {
     }
   }
 
-  DateTime? _scheduledDateTimeFor(MedicationIntake intake) {
-    final scheduledAt = intake.scheduledAt;
-    if (scheduledAt == null) {
-      return null;
+  bool _isPendingDue(MedicationIntake intake, DateTime now) {
+    if (intake.status.toLowerCase() != 'pending') {
+      return false;
     }
 
-    try {
-      return DateTime.parse(scheduledAt);
-    } catch (error) {
-      debugPrint(
-        '[IntakeNotificationManager] Error parseando scheduledAt: $scheduledAt - $error',
-      );
-      return null;
+    final scheduledDateTime = _scheduledDateTimeFor(intake);
+    if (scheduledDateTime == null) {
+      return false;
     }
+
+    return !now.isBefore(scheduledDateTime);
+  }
+
+  DateTime? _scheduledDateTimeFor(MedicationIntake intake) {
+    final scheduledDateTime = intake.scheduledDateTime;
+    if (scheduledDateTime == null && intake.scheduledAt != null) {
+      debugPrint(
+        '[IntakeNotificationManager] Error parseando scheduledAt: ${intake.scheduledAt}',
+      );
+    }
+    return scheduledDateTime;
   }
 
   void clearNotifiedIntakes() {
