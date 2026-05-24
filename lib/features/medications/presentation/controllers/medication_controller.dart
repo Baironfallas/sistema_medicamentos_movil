@@ -4,6 +4,7 @@ import '../../data/medication_exception.dart';
 import '../../data/medication_service.dart';
 import '../../models/medication.dart';
 import '../../models/medication_intake.dart';
+import '../../services/intake_notification_manager.dart';
 
 class MedicationController extends ChangeNotifier {
   MedicationController({MedicationService? service})
@@ -60,6 +61,7 @@ class MedicationController extends ChangeNotifier {
 
     try {
       await _service.createMedication(draft);
+      await IntakeNotificationManager().refreshScheduledNotifications();
       await loadMedications();
       return true;
     } catch (error) {
@@ -78,6 +80,7 @@ class MedicationController extends ChangeNotifier {
 
     try {
       await _service.updateMedication(id, draft);
+      await IntakeNotificationManager().refreshScheduledNotifications();
       await loadMedications();
       return true;
     } catch (error) {
@@ -96,6 +99,7 @@ class MedicationController extends ChangeNotifier {
 
     try {
       await _service.deleteMedication(id);
+      await IntakeNotificationManager().refreshScheduledNotifications();
       await loadMedications();
       return true;
     } catch (error) {
@@ -122,6 +126,7 @@ class MedicationController extends ChangeNotifier {
 
     try {
       await _service.confirmIntake(intakeId, status: status);
+      await IntakeNotificationManager().refreshScheduledNotifications();
       await loadTodayIntakes();
       return true;
     } catch (error) {

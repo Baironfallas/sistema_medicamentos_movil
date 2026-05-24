@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+
 import '../../../core/services/local_notification_service.dart';
 import '../data/medication_service.dart';
 import '../models/medication_intake.dart';
@@ -18,14 +20,11 @@ class IntakeNotificationManager {
   final LocalNotificationService _notificationService =
       LocalNotificationService();
 
-  Timer? _pollingTimer;
-  final Set<int> _notifiedIntakeIds = {};
+  Timer? _syncTimer;
+  final Set<int> _notifiedNowIntakeIds = {};
   bool _isRunning = false;
 
-  // Intervalo de verificación en segundos (cada 30 segundos)
-  static const int _pollingIntervalSeconds = 30;
-
-  // Minutos antes de la hora programada para mostrar la notificación
+  static const int _syncIntervalHours = 1;
   static const int _notificationAdvanceMinutes = 0;
 
   Future<void> start() async {
@@ -36,66 +35,105 @@ class IntakeNotificationManager {
       '[IntakeNotificationManager] Iniciando gestor de notificaciones',
     );
 
-    // Ejecutar la primera verificación inmediatamente
-    await _checkAndNotifyPendingIntakes();
+    await refreshScheduledNotifications();
 
-    // Luego ejecutar cada X segundos
-    _pollingTimer = Timer.periodic(
-      Duration(seconds: _pollingIntervalSeconds),
-      (_) => _checkAndNotifyPendingIntakes(),
+    _syncTimer = Timer.periodic(
+      Duration(hours: _syncIntervalHours),
+      (_) => refreshScheduledNotifications(),
     );
   }
 
   Future<void> stop() async {
-    _pollingTimer?.cancel();
+    _syncTimer?.cancel();
+    _syncTimer = null;
     _isRunning = false;
     debugPrint(
       '[IntakeNotificationManager] Deteniendo gestor de notificaciones',
     );
   }
 
-  Future<void> _checkAndNotifyPendingIntakes() async {
+  Future<void> refreshScheduledNotifications() async {
     try {
-      final List<MedicationIntake> todayIntakes = await _medicationService
-          .getTodayIntakes();
-
+      final todayIntakes = await _medicationService.getTodayIntakes();
       final now = DateTime.now();
+      final pendingNotificationIds = await _notificationService
+          .pendingMedicationReminderIds();
+      final pendingIntakeIds = todayIntakes
+          .where((intake) => intake.status.toLowerCase() == 'pending')
+          .map((intake) => intake.id)
+          .toSet();
+
+      for (final notificationId in pendingNotificationIds) {
+        if (!pendingIntakeIds.contains(notificationId)) {
+          await _notificationService.cancelNotification(notificationId);
+        }
+      }
 
       for (final intake in todayIntakes) {
-        // Solo procesar tomas pendientes
         if (intake.status.toLowerCase() != 'pending') {
+          await _notificationService.cancelNotification(intake.id);
           continue;
         }
 
-        // Si ya se notificó, saltar
-        if (_notifiedIntakeIds.contains(intake.id)) {
+        final scheduledAt = intake.scheduledAt;
+        if (scheduledAt == null) {
           continue;
         }
 
-        // Parsear la hora programada (skip si scheduledAt es null)
-        if (intake.scheduledAt == null) {
-          continue;
-        }
-
-        final scheduledDateTime = _parseScheduledTime(intake.scheduledAt!);
+        final scheduledDateTime = _parseScheduledTime(scheduledAt);
         if (scheduledDateTime == null) {
           continue;
         }
 
-        // Calcular cuándo mostrar la notificación
         final notificationTime = scheduledDateTime.subtract(
           Duration(minutes: _notificationAdvanceMinutes),
         );
+        final notificationWindowEnd = scheduledDateTime.add(
+          const Duration(minutes: 2),
+        );
 
-        // Si es hora de notificar (dentro de una ventana de 2 minutos)
-        if (now.isAfter(notificationTime) &&
-            now.isBefore(scheduledDateTime.add(const Duration(minutes: 2)))) {
+        if (notificationTime.isAfter(now)) {
+          if (!pendingNotificationIds.contains(intake.id)) {
+            await _scheduleNotification(intake, notificationTime);
+          }
+          continue;
+        }
+
+        if (now.isBefore(notificationWindowEnd) &&
+            !_notifiedNowIntakeIds.contains(intake.id)) {
           await _showNotification(intake);
-          _notifiedIntakeIds.add(intake.id);
+          _notifiedNowIntakeIds.add(intake.id);
         }
       }
     } catch (error) {
-      debugPrint('[IntakeNotificationManager] Error verificando tomas: $error');
+      debugPrint(
+        '[IntakeNotificationManager] Error sincronizando notificaciones: $error',
+      );
+    }
+  }
+
+  Future<void> _scheduleNotification(
+    MedicationIntake intake,
+    DateTime notificationTime,
+  ) async {
+    try {
+      final timeLabel = intake.timeLabel ?? 'Hora programada';
+
+      await _notificationService.scheduleMedicationReminder(
+        id: intake.id,
+        medicationName: intake.medicationName,
+        scheduledAt: notificationTime,
+        scheduledTime: timeLabel,
+        dosage: intake.dosage,
+      );
+
+      debugPrint(
+        '[IntakeNotificationManager] Notificacion agendada: ${intake.medicationName} a las $timeLabel',
+      );
+    } catch (error) {
+      debugPrint(
+        '[IntakeNotificationManager] Error agendando notificacion: $error',
+      );
     }
   }
 
@@ -111,17 +149,15 @@ class IntakeNotificationManager {
       );
 
       debugPrint(
-        '[IntakeNotificationManager] Notificación mostrada: ${intake.medicationName} a las $timeLabel',
+        '[IntakeNotificationManager] Notificacion mostrada: ${intake.medicationName} a las $timeLabel',
       );
     } catch (error) {
       debugPrint(
-        '[IntakeNotificationManager] Error mostrando notificación: $error',
+        '[IntakeNotificationManager] Error mostrando notificacion: $error',
       );
     }
   }
 
-  /// Parsea la hora programada desde el string de la base de datos
-  /// Formato esperado: 'YYYY-MM-DD HH:MM:SS'
   DateTime? _parseScheduledTime(String scheduledAt) {
     try {
       return DateTime.parse(scheduledAt);
@@ -133,14 +169,12 @@ class IntakeNotificationManager {
     }
   }
 
-  /// Limpiar intakes notificadas (útil cuando se descarga nueva lista)
   void clearNotifiedIntakes() {
-    _notifiedIntakeIds.clear();
+    _notifiedNowIntakeIds.clear();
   }
 
-  /// Verificar si una toma ya fue notificada
   bool isIntakeNotified(int intakeId) {
-    return _notifiedIntakeIds.contains(intakeId);
+    return _notifiedNowIntakeIds.contains(intakeId);
   }
 
   bool get isRunning => _isRunning;

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -17,21 +15,16 @@ class PendingIntakesAlert extends StatefulWidget {
 class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
   late final MedicationController _controller;
   late final Future<void> _loadIntakes;
-  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _controller = MedicationController();
     _loadIntakes = _controller.loadTodayIntakes();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      _controller.loadTodayIntakes();
-    });
   }
 
   @override
   void dispose() {
-    _refreshTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -113,19 +106,7 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                 .toList();
 
             if (pendingIntakes.isEmpty) {
-              return Column(
-                children: [
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () => _controller.loadTodayIntakes(),
-                      icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('Actualizar tomas'),
-                    ),
-                  ),
-                ],
-              );
+              return const SizedBox(height: 8);
             }
 
             return Column(

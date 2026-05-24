@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../features/medications/data/medication_service.dart';
 
@@ -27,6 +29,9 @@ class LocalNotificationService {
 
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    tz_data.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('America/Costa_Rica'));
 
     _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -71,6 +76,8 @@ class LocalNotificationService {
       onDidReceiveBackgroundNotificationResponse:
           medicationNotificationBackgroundHandler,
     );
+
+    await _requestRuntimePermissions();
 
     _isInitialized = true;
   }
@@ -136,12 +143,93 @@ class LocalNotificationService {
     );
   }
 
+  Future<void> scheduleMedicationReminder({
+    required int id,
+    required String medicationName,
+    required DateTime scheduledAt,
+    required String scheduledTime,
+    String? dosage,
+  }) async {
+    final notificationDate = _toLocalNotificationDate(scheduledAt);
+    if (!notificationDate.isAfter(tz.TZDateTime.now(tz.local))) {
+      return;
+    }
+
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'medication_reminders',
+          'Recordatorios de Medicamentos',
+          channelDescription:
+              'Notificaciones para recordar tomar medicamentos a tiempo',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+          enableVibration: true,
+          actions: const [
+            AndroidNotificationAction(
+              _medicationTakenActionId,
+              'Tomada',
+              showsUserInterface: true,
+              cancelNotification: true,
+            ),
+            AndroidNotificationAction(
+              _medicationOmittedActionId,
+              'Omitida',
+              showsUserInterface: true,
+              cancelNotification: true,
+            ),
+          ],
+        );
+
+    final DarwinNotificationDetails iosDetails =
+        const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          categoryIdentifier: _medicationIntakeCategoryId,
+        );
+
+    final NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    final String title = 'Hora de tomar medicamento';
+    final String body =
+        '$medicationName'
+        '${dosage != null ? ' - $dosage' : ''}'
+        '\n'
+        'Programado: $scheduledTime';
+
+    await _notificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      notificationDate,
+      details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: 'intake_$id',
+    );
+  }
+
   Future<void> cancelNotification(int id) async {
     await _notificationsPlugin.cancel(id);
   }
 
   Future<void> cancelAllNotifications() async {
     await _notificationsPlugin.cancelAll();
+  }
+
+  Future<Set<int>> pendingMedicationReminderIds() async {
+    final pendingRequests = await _notificationsPlugin
+        .pendingNotificationRequests();
+
+    return pendingRequests
+        .where((request) => request.payload?.startsWith('intake_') ?? false)
+        .map((request) => request.id)
+        .toSet();
   }
 
   static Future<void> _onSelectNotification(
@@ -168,6 +256,7 @@ class LocalNotificationService {
 
     try {
       await MedicationService().confirmIntake(intakeId, status: actionStatus);
+      await LocalNotificationService().cancelNotification(intakeId);
       debugPrint(
         '[LocalNotificationService] Toma $intakeId marcada como $actionStatus',
       );
@@ -192,5 +281,26 @@ class LocalNotificationService {
       return null;
     }
     return int.tryParse(payload.substring('intake_'.length));
+  }
+
+  Future<void> _requestRuntimePermissions() async {
+    final androidImplementation = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    await androidImplementation?.requestNotificationsPermission();
+  }
+
+  tz.TZDateTime _toLocalNotificationDate(DateTime dateTime) {
+    return tz.TZDateTime(
+      tz.local,
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+      dateTime.hour,
+      dateTime.minute,
+      dateTime.second,
+    );
   }
 }
