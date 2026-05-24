@@ -198,7 +198,7 @@ class _ChatPageState extends State<ChatPage> {
         final title =
             _controller.currentSession?.displayTitle ??
             widget.initialTitle ??
-            'Nuevo chat';
+            'Asistente Virtual';
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -220,7 +220,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             actions: [
               IconButton(
-                tooltip: 'Nuevo chat',
+                tooltip: 'Nuevo asistente',
                 onPressed: _controller.isSending
                     ? null
                     : _controller.startNewSession,

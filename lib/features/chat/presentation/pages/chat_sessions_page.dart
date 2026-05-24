@@ -91,7 +91,7 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
                   ),
                   onPressed: () => _openChat(),
                   icon: const Icon(Icons.add_comment_outlined),
-                  label: const Text('Nuevo chat'),
+                  label: const Text('Nuevo asistente'),
                 ),
               ],
             ),
@@ -200,7 +200,7 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
         surfaceTintColor: Colors.transparent,
         shadowColor: AppColors.border.withValues(alpha: 0.1),
         title: const Text(
-          'Chatbot',
+          'Asistente Virtual',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w700,
