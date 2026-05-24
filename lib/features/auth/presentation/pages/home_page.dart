@@ -348,6 +348,43 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          MedicineReminderApp.chatRoute,
+                                        );
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.textPrimary,
+                                        side: const BorderSide(
+                                          color: AppColors.border,
+                                          width: 1.5,
+                                        ),
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          56,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.chat_bubble_outline,
+                                      ),
+                                      label: const Text(
+                                        'Chatbot',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             );
