@@ -55,9 +55,9 @@ class ChatMessageBubble extends StatelessWidget {
                           : Border.all(color: AppColors.border, width: 1.0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
@@ -117,9 +117,11 @@ class _Avatar extends StatelessWidget {
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color == AppColors.aiColor
+            ? AppColors.aiBackground
+            : color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.16)),
       ),
       child: Icon(icon, color: color, size: 18),
     );

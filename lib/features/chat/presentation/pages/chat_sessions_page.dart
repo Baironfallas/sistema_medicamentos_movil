@@ -113,9 +113,9 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
           border: Border.all(color: AppColors.border, width: 1.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -125,8 +125,11 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.aiColor.withValues(alpha: 0.12),
+                color: AppColors.aiBackground,
                 borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: AppColors.aiColor.withValues(alpha: 0.16),
+                ),
               ),
               child: const Icon(
                 Icons.chat_bubble_outline,

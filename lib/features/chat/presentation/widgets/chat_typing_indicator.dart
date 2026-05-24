@@ -16,10 +16,10 @@ class ChatTypingIndicator extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.aiColor.withValues(alpha: 0.12),
+              color: AppColors.aiBackground,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.aiColor.withValues(alpha: 0.25),
+                color: AppColors.aiColor.withValues(alpha: 0.16),
               ),
             ),
             child: const Icon(
