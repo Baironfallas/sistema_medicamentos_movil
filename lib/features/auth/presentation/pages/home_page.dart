@@ -107,19 +107,38 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 74,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 1,
         surfaceTintColor: Colors.transparent,
         shadowColor: AppColors.border.withValues(alpha: 0.1),
         titleSpacing: 20,
-        title: const Text(
-          'Sistema de Medicamentos',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 19,
-            fontWeight: FontWeight.w700,
-          ),
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Medora',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                height: 1.05,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Tu salud organizada',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.1,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -153,10 +172,10 @@ class _HomePageState extends State<HomePage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(22, 28, 22, bottomPadding),
+                  padding: EdgeInsets.fromLTRB(22, 34, 22, bottomPadding),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 28 - bottomPadding,
+                      minHeight: constraints.maxHeight - 34 - bottomPadding,
                     ),
                     child: Center(
                       child: ConstrainedBox(
