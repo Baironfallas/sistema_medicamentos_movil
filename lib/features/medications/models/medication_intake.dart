@@ -1,3 +1,5 @@
+import '../../../core/utils/server_date_time.dart';
+
 class MedicationIntake {
   MedicationIntake({
     required this.id,
@@ -21,7 +23,9 @@ class MedicationIntake {
   final String? scheduledAt;
   final String? dosage;
 
-  DateTime? get scheduledDateTime => _dateTimeFromIso(scheduledAt);
+  DateTime? get scheduledDateTime =>
+      parseServerDateTime(scheduledAt) ??
+      _dateTimeFromLabels(dateLabel, timeLabel);
 
   factory MedicationIntake.fromJson(Map<String, dynamic> json) {
     final id = _toInt(json['intakeId'] ?? json['id']);
@@ -68,8 +72,8 @@ class MedicationIntake {
         _string(json['scheduledDate']) ??
         _string(json['day']);
 
-    final timeLabel = _timeFromIso(scheduledAt) ?? hour;
-    final dateLabel = _dateFromIso(scheduledAt) ?? date;
+    final timeLabel = formatServerTime(scheduledAt) ?? hour;
+    final dateLabel = formatServerDate(scheduledAt) ?? date;
 
     final dosage =
         _string(json['dosage']) ??
@@ -170,74 +174,55 @@ String? _string(Object? value) {
   return text == null || text.isEmpty ? null : text;
 }
 
-String? _timeFromIso(String? iso) {
-  if (iso == null || iso.isEmpty) {
+DateTime? _dateTimeFromLabels(String? dateLabel, String? timeLabel) {
+  final timeMatch = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(timeLabel ?? '');
+  if (timeMatch == null) {
     return null;
   }
 
-  final parsed = _dateTimeFromIso(iso);
-  if (parsed == null) {
-    return RegExp(r'\d{2}:\d{2}').firstMatch(iso)?.group(0);
-  }
-
-  final hour = parsed.hour.toString().padLeft(2, '0');
-  final minute = parsed.minute.toString().padLeft(2, '0');
-  return '$hour:$minute';
-}
-
-String? _dateFromIso(String? iso) {
-  if (iso == null || iso.isEmpty) {
+  final parsedDate = _datePartsFromLabel(dateLabel) ?? DateTime.now();
+  final hour = int.tryParse(timeMatch.group(1) ?? '');
+  final minute = int.tryParse(timeMatch.group(2) ?? '');
+  if (hour == null || minute == null) {
     return null;
   }
 
-  final parsed = _dateTimeFromIso(iso);
-  if (parsed == null) {
-    return RegExp(r'\d{4}-\d{2}-\d{2}').firstMatch(iso)?.group(0);
-  }
-
-  final year = parsed.year.toString().padLeft(4, '0');
-  final month = parsed.month.toString().padLeft(2, '0');
-  final day = parsed.day.toString().padLeft(2, '0');
-  return '$year-$month-$day';
+  return DateTime(
+    parsedDate.year,
+    parsedDate.month,
+    parsedDate.day,
+    hour,
+    minute,
+  );
 }
 
-DateTime? _dateTimeFromIso(String? iso) {
-  if (iso == null || iso.isEmpty) {
+DateTime? _datePartsFromLabel(String? value) {
+  if (value == null || value.trim().isEmpty) {
     return null;
   }
 
-  final value = iso.trim();
-  final parsed = DateTime.tryParse(value);
-  if (parsed == null) {
-    return null;
+  final normalized = value.trim();
+  final isoMatch = RegExp(
+    r'^(\d{4})-(\d{2})-(\d{2})$',
+  ).firstMatch(normalized);
+  if (isoMatch != null) {
+    return DateTime(
+      int.parse(isoMatch.group(1)!),
+      int.parse(isoMatch.group(2)!),
+      int.parse(isoMatch.group(3)!),
+    );
   }
 
-  if (parsed.isUtc || _hasTimeZoneOffset(value)) {
-    return parsed.toLocal();
+  final slashMatch = RegExp(
+    r'^(\d{2})/(\d{2})/(\d{4})$',
+  ).firstMatch(normalized);
+  if (slashMatch != null) {
+    return DateTime(
+      int.parse(slashMatch.group(3)!),
+      int.parse(slashMatch.group(2)!),
+      int.parse(slashMatch.group(1)!),
+    );
   }
 
-  // The backend stores MySQL DATETIME values and may serialize the UTC clock
-  // without an explicit Z. Treat scheduledAt date-times from the API as UTC.
-  if (_looksLikeBackendDateTime(value)) {
-    return DateTime.utc(
-      parsed.year,
-      parsed.month,
-      parsed.day,
-      parsed.hour,
-      parsed.minute,
-      parsed.second,
-      parsed.millisecond,
-      parsed.microsecond,
-    ).toLocal();
-  }
-
-  return parsed;
-}
-
-bool _hasTimeZoneOffset(String value) {
-  return RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(value);
-}
-
-bool _looksLikeBackendDateTime(String value) {
-  return RegExp(r'^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}').hasMatch(value);
+  return null;
 }
