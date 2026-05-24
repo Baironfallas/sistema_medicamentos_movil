@@ -4,7 +4,6 @@ import '../../../../app.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_service.dart';
 import '../../models/auth_user.dart';
-import '../../../medications/presentation/widgets/pending_intakes_alert.dart';
 import '../../../medications/services/intake_notification_manager.dart';
 
 class HomePage extends StatefulWidget {
@@ -247,7 +246,6 @@ class _HomePageState extends State<HomePage> {
                                           height: 1.45,
                                         ),
                                   ),
-                                  const PendingIntakesAlert(),
                                   const SizedBox(height: 22),
                                   Container(
                                     width: double.infinity,

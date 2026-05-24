@@ -124,128 +124,95 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.warning.withValues(alpha: 0.12),
-            AppColors.warning.withValues(alpha: 0.06),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.warning.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.warning.withValues(alpha: 0.25),
-          width: 1.5,
+          color: AppColors.warning.withValues(alpha: 0.22),
+          width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.warning.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(11),
                 ),
-                child: Icon(
-                  Icons.notifications_active,
+                child: const Icon(
+                  Icons.notifications_active_outlined,
                   color: AppColors.warning,
-                  size: 22,
+                  size: 20,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Medicamentos por tomar',
                       style: TextStyle(
-                        color: AppColors.warning,
-                        fontSize: 13,
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 0.2,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      '${intakes.length} ${intakes.length == 1 ? 'toma pendiente' : 'tomas pendientes'}',
+                      _displayMedicationName(firstIntake),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
                       ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule_outlined,
+                          color: AppColors.textSecondary,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          firstIntake.timeLabel ?? 'Horario pendiente',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (intakes.length > 1) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            '+${intakes.length - 1} mas',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border, width: 1.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _displayMedicationName(firstIntake),
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.schedule_outlined,
-                      color: AppColors.textSecondary,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      firstIntake.timeLabel ?? 'Horario pendiente',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                if (intakes.length > 1) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    '+ ${intakes.length - 1} mas',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -255,27 +222,34 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                     side: BorderSide(
                       color: AppColors.error.withValues(alpha: 0.5),
                     ),
-                    minimumSize: const Size(0, 44),
+                    minimumSize: const Size(0, 38),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(11),
                     ),
                   ),
                   onPressed: isUpdating
                       ? null
                       : () => _updateIntakeStatus(firstIntake, 'omitted'),
-                  icon: const Icon(Icons.cancel_outlined),
-                  label: const Text('Omitida'),
+                  icon: const Icon(Icons.cancel_outlined, size: 17),
+                  label: const Text(
+                    'Omitida',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.warning,
                     foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 44),
+                    minimumSize: const Size(0, 38),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(11),
                     ),
                   ),
                   onPressed: isUpdating
@@ -296,8 +270,8 @@ class _PendingIntakesAlertState extends State<PendingIntakesAlert> {
                   label: const Text(
                     'Tomada',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

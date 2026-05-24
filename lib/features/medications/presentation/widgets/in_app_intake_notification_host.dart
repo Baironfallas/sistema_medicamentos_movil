@@ -65,169 +65,243 @@ class _InAppIntakeNotificationHostState
     return ListenableBuilder(
       listenable: _manager,
       builder: (context, _) {
-        if (!_manager.usesInAppAlerts || _manager.inAppAlerts.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        final intake = _manager.inAppAlerts.first;
-        final extraCount = _manager.inAppAlerts.length - 1;
-        final isUpdating = _updatingIntakeIds.contains(intake.id);
-        final medicationLabel = _displayMedicationName(intake);
-
+        final hasAlert =
+            _manager.usesInAppAlerts && _manager.inAppAlerts.isNotEmpty;
         return Positioned(
-          left: 16,
-          right: 16,
-          top: MediaQuery.of(context).viewPadding.top + 14,
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: AppColors.warning.withValues(alpha: 0.35),
-                      width: 1.2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.16),
-                        blurRadius: 22,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+          left: 12,
+          right: 12,
+          top: MediaQuery.of(context).viewPadding.top + 10,
+          child: IgnorePointer(
+            ignoring: !hasAlert,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 240),
+              reverseDuration: const Duration(milliseconds: 180),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                final slideAnimation = Tween<Offset>(
+                  begin: const Offset(0, -0.18),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: slideAnimation,
+                    child: child,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 42,
-                              height: 42,
-                              decoration: BoxDecoration(
-                                color: AppColors.warning.withValues(
-                                  alpha: 0.14,
-                                ),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Icon(
-                                Icons.notifications_active_outlined,
-                                color: AppColors.warning,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Toma pendiente',
-                                    style: TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    medicationLabel,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      height: 1.25,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    'Programado: ${intake.timeLabel ?? 'Horario pendiente'}'
-                                    '${extraCount > 0 ? '  |  +$extraCount mas' : ''}',
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.error,
-                                  side: BorderSide(
-                                    color: AppColors.error.withValues(
-                                      alpha: 0.5,
-                                    ),
-                                  ),
-                                  minimumSize: const Size(0, 44),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: isUpdating
-                                    ? null
-                                    : () => _updateStatus(intake, 'omitted'),
-                                icon: const Icon(Icons.cancel_outlined),
-                                label: const Text('Omitida'),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.warning,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(0, 44),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: isUpdating
-                                    ? null
-                                    : () => _updateStatus(intake, 'taken'),
-                                icon: isUpdating
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : const Icon(Icons.check_circle_outline),
-                                label: const Text('Tomada'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                );
+              },
+              child: hasAlert
+                  ? _buildToast(
+                      context,
+                      _manager.inAppAlerts.first,
+                      _manager.inAppAlerts.length - 1,
+                    )
+                  : const SizedBox.shrink(key: ValueKey('empty')),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildToast(
+    BuildContext context,
+    MedicationIntake intake,
+    int extraCount,
+  ) {
+    final isUpdating = _updatingIntakeIds.contains(intake.id);
+    final medicationLabel = _displayMedicationName(intake);
+    final timeLabel = intake.timeLabel ?? 'Horario pendiente';
+
+    return Center(
+      key: ValueKey('intake-${intake.id}'),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 430),
+        child: Material(
+          color: Colors.transparent,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: AppColors.warning.withValues(alpha: 0.24),
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final useStackedButtons = constraints.maxWidth < 340;
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.notifications_active_outlined,
+                              color: AppColors.warning,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Toma pendiente',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                    height: 1.15,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  medicationLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildTimePill(timeLabel, extraCount),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      useStackedButtons
+                          ? Column(
+                              children: [
+                                _buildOmitButton(intake, isUpdating),
+                                const SizedBox(height: 8),
+                                _buildTakenButton(intake, isUpdating),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  child: _buildOmitButton(intake, isUpdating),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _buildTakenButton(intake, isUpdating),
+                                ),
+                              ],
+                            ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimePill(String timeLabel, int extraCount) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.schedule_outlined,
+            color: AppColors.textSecondary,
+            size: 13,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            extraCount > 0 ? '$timeLabel +$extraCount' : timeLabel,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              height: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOmitButton(MedicationIntake intake, bool isUpdating) {
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.error,
+        side: BorderSide(color: AppColors.error.withValues(alpha: 0.42)),
+        minimumSize: const Size(0, 38),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+      ),
+      onPressed: isUpdating ? null : () => _updateStatus(intake, 'omitted'),
+      icon: const Icon(Icons.cancel_outlined, size: 17),
+      label: const Text(
+        'Omitida',
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+
+  Widget _buildTakenButton(MedicationIntake intake, bool isUpdating) {
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(
+        backgroundColor: AppColors.warning,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(0, 38),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+      ),
+      onPressed: isUpdating ? null : () => _updateStatus(intake, 'taken'),
+      icon: isUpdating
+          ? const SizedBox(
+              width: 15,
+              height: 15,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+          : const Icon(Icons.check_circle_outline, size: 17),
+      label: const Text(
+        'Tomada',
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
     );
   }
 
