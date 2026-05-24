@@ -4,6 +4,7 @@ import '../../../../app.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_service.dart';
 import '../../models/auth_user.dart';
+import '../../../medications/services/intake_notification_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +18,12 @@ class _HomePageState extends State<HomePage> {
 
   late final Future<AuthUser?> _user = _authService.getAuthenticatedUser();
   bool _isLoggingOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    IntakeNotificationManager().start();
+  }
 
   Future<void> _confirmLogout() async {
     final shouldLogout = await showDialog<bool>(
@@ -68,6 +75,7 @@ class _HomePageState extends State<HomePage> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final serverLogoutSucceeded = await _authService.logout();
+    await IntakeNotificationManager().stop();
 
     if (!mounted) {
       return;
@@ -99,19 +107,38 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 74,
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 1,
         surfaceTintColor: Colors.transparent,
         shadowColor: AppColors.border.withValues(alpha: 0.1),
         titleSpacing: 20,
-        title: const Text(
-          'Sistema de Medicamentos',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 19,
-            fontWeight: FontWeight.w700,
-          ),
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Medora',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                height: 1.05,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Tu salud organizada',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.1,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -145,10 +172,10 @@ class _HomePageState extends State<HomePage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(22, 28, 22, bottomPadding),
+                  padding: EdgeInsets.fromLTRB(22, 34, 22, bottomPadding),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 28 - bottomPadding,
+                      minHeight: constraints.maxHeight - 34 - bottomPadding,
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -339,6 +366,43 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       label: const Text(
                                         'Tomas de hoy',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          MedicineReminderApp.chatRoute,
+                                        );
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.textPrimary,
+                                        side: const BorderSide(
+                                          color: AppColors.border,
+                                          width: 1.5,
+                                        ),
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          56,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.chat_bubble_outline,
+                                      ),
+                                      label: const Text(
+                                        'Chatbot',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,

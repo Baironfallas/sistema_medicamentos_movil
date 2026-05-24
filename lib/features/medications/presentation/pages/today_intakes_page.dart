@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../models/medication_intake.dart';
 import '../controllers/medication_controller.dart';
 import '../widgets/info_banner.dart';
@@ -29,6 +30,8 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
 
   Widget _buildEmptyState() {
     return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: AppColors.surface,
       onRefresh: _controller.loadTodayIntakes,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -45,7 +48,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
               children: [
                 const Icon(
                   Icons.notifications_active_outlined,
-                  color: Color(0xFF9BA8AB),
+                  color: AppColors.textSecondary,
                   size: 56,
                 ),
                 const SizedBox(height: 14),
@@ -53,7 +56,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                   'No tienes tomas programadas para hoy.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFFCCD0CF),
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -61,7 +64,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                 const Text(
                   'Cuando existan horarios pendientes los veras aqui.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF9BA8AB)),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -74,30 +77,28 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
   Widget _buildIntakeCard(MedicationIntake intake) {
     final status = intake.status.toLowerCase();
     final statusLabel = status == 'taken'
-        ? 'Confirmada'
+        ? 'Tomada'
         : status == 'omitted'
         ? 'Omitida'
         : 'Pendiente';
     final statusColor = status == 'taken'
-        ? const Color(0xFF86EFAC)
+        ? AppColors.success
         : status == 'omitted'
-        ? const Color(0xFFFFB4AB)
-        : const Color(0xFFFCD34D);
+        ? AppColors.error
+        : AppColors.warning;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF11212D).withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFF253745).withValues(alpha: 0.8),
-        ),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -110,7 +111,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                 child: Text(
                   intake.medicationName,
                   style: const TextStyle(
-                    color: Color(0xFFCCD0CF),
+                    color: AppColors.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -122,9 +123,11 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.16),
+                  color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: statusColor.withValues(alpha: 0.35),
+                  ),
                 ),
                 child: Text(
                   statusLabel,
@@ -142,34 +145,57 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
             children: [
               const Icon(
                 Icons.schedule_outlined,
-                color: Color(0xFF9BA8AB),
+                color: AppColors.textSecondary,
                 size: 18,
               ),
               const SizedBox(width: 6),
               Text(
                 intake.timeLabel ?? 'Horario pendiente',
-                style: const TextStyle(color: Color(0xFF9BA8AB)),
+                style: const TextStyle(color: AppColors.textSecondary),
               ),
               if (intake.dateLabel != null) ...[
                 const SizedBox(width: 10),
                 Text(
                   intake.dateLabel!,
-                  style: const TextStyle(color: Color(0xFF9BA8AB)),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ],
           ),
           if (intake.canConfirm) ...[
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                onPressed: _controller.isConfirming
-                    ? null
-                    : () => _confirmIntake(intake),
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Confirmar toma'),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    onPressed: _controller.isConfirming
+                        ? null
+                        : () => _updateIntakeStatus(intake, 'omitted'),
+                    icon: const Icon(Icons.cancel_outlined),
+                    label: const Text('Omitida'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.surface,
+                    ),
+                    onPressed: _controller.isConfirming
+                        ? null
+                        : () => _updateIntakeStatus(intake, 'taken'),
+                    icon: const Icon(Icons.check_circle_outline),
+                    label: const Text('Tomada'),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -177,8 +203,11 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
     );
   }
 
-  Future<void> _confirmIntake(MedicationIntake intake) async {
-    final success = await _controller.confirmIntake(intake.id);
+  Future<void> _updateIntakeStatus(
+    MedicationIntake intake,
+    String status,
+  ) async {
+    final success = await _controller.updateIntakeStatus(intake.id, status);
     if (!mounted) {
       return;
     }
@@ -192,24 +221,50 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+      return;
+    }
+
+    if (success) {
+      final statusLabel = status == 'taken' ? 'tomada' : 'omitida';
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('${intake.medicationName} marcada como $statusLabel'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: status == 'taken'
+                ? AppColors.success
+                : AppColors.error,
+          ),
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF06141B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF06141B),
-        foregroundColor: const Color(0xFFCCD0CF),
-        title: const Text('Tomas de hoy'),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 1,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.border.withValues(alpha: 0.1),
+        title: const Text(
+          'Tomas de hoy',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 19,
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Actualizar',
             onPressed: _controller.isLoadingIntakes
                 ? null
                 : _controller.loadTodayIntakes,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -217,7 +272,9 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
         animation: _controller,
         builder: (context, _) {
           if (_controller.isLoadingIntakes) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           if (_controller.todayIntakes.isEmpty) {
@@ -225,6 +282,8 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
           }
 
           return RefreshIndicator(
+            color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             onRefresh: _controller.loadTodayIntakes,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),

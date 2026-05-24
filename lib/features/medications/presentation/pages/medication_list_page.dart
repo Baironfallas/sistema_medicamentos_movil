@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../models/medication.dart';
 import '../controllers/medication_controller.dart';
 import '../widgets/info_banner.dart';
@@ -46,16 +47,35 @@ class _MedicationListPageState extends State<MedicationListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Eliminar medicamento'),
+          backgroundColor: AppColors.surface,
+          surfaceTintColor: Colors.transparent,
+          title: const Text(
+            'Eliminar medicamento',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           content: Text(
             'Deseas eliminar "${medication.name}"? Esta accion no se puede deshacer.',
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ),
             FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: AppColors.surface,
+              ),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Eliminar'),
             ),
@@ -87,6 +107,8 @@ class _MedicationListPageState extends State<MedicationListPage> {
 
   Widget _buildEmptyState() {
     return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: AppColors.surface,
       onRefresh: _controller.loadMedications,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -103,7 +125,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
               children: [
                 const Icon(
                   Icons.medication_outlined,
-                  color: Color(0xFF9BA8AB),
+                  color: AppColors.textSecondary,
                   size: 56,
                 ),
                 const SizedBox(height: 14),
@@ -111,7 +133,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
                   'Aun no tienes medicamentos registrados.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFFCCD0CF),
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -119,10 +141,14 @@ class _MedicationListPageState extends State<MedicationListPage> {
                 const Text(
                   'Agrega tu primer medicamento para empezar con los recordatorios.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF9BA8AB)),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 20),
                 FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.surface,
+                  ),
                   onPressed: () => _openForm(),
                   icon: const Icon(Icons.add),
                   label: const Text('Agregar medicamento'),
@@ -145,16 +171,14 @@ class _MedicationListPageState extends State<MedicationListPage> {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF11212D).withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFF253745).withValues(alpha: 0.8),
-        ),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -171,7 +195,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
                     Text(
                       medication.name,
                       style: const TextStyle(
-                        color: Color(0xFFCCD0CF),
+                        color: AppColors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -181,7 +205,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
                       const SizedBox(height: 4),
                       Text(
                         'Dosis: ${medication.dose}',
-                        style: const TextStyle(color: Color(0xFF9BA8AB)),
+                        style: const TextStyle(color: AppColors.textSecondary),
                       ),
                     ],
                   ],
@@ -190,17 +214,17 @@ class _MedicationListPageState extends State<MedicationListPage> {
               IconButton(
                 tooltip: 'Editar',
                 onPressed: () => _openForm(medication: medication),
-                icon: const Icon(Icons.edit_outlined, color: Color(0xFFCCD0CF)),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.secondary,
+                ),
               ),
               IconButton(
                 tooltip: 'Eliminar',
                 onPressed: _controller.isDeleting
                     ? null
                     : () => _confirmDelete(medication),
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: Color(0xFFFFB4AB),
-                ),
+                icon: const Icon(Icons.delete_outline, color: AppColors.error),
               ),
             ],
           ),
@@ -209,14 +233,14 @@ class _MedicationListPageState extends State<MedicationListPage> {
             children: [
               const Icon(
                 Icons.schedule_outlined,
-                color: Color(0xFF9BA8AB),
+                color: AppColors.textSecondary,
                 size: 18,
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   scheduleText,
-                  style: const TextStyle(color: Color(0xFF9BA8AB)),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -226,14 +250,14 @@ class _MedicationListPageState extends State<MedicationListPage> {
             children: [
               const Icon(
                 Icons.medication_liquid_outlined,
-                color: Color(0xFF9BA8AB),
+                color: AppColors.textSecondary,
                 size: 18,
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'Cantidad: ${medication.quantityPerIntake} | Total: ${medication.totalPills}',
-                  style: const TextStyle(color: Color(0xFF9BA8AB)),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -245,14 +269,14 @@ class _MedicationListPageState extends State<MedicationListPage> {
               children: [
                 const Icon(
                   Icons.inventory_2_outlined,
-                  color: Color(0xFF9BA8AB),
+                  color: AppColors.textSecondary,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'Restantes: ${medication.pillsRemaining ?? '-'} | Dias: ${medication.daysRemaining ?? '-'}',
-                    style: const TextStyle(color: Color(0xFF9BA8AB)),
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ),
               ],
@@ -263,13 +287,13 @@ class _MedicationListPageState extends State<MedicationListPage> {
             children: [
               const Icon(
                 Icons.event_outlined,
-                color: Color(0xFF9BA8AB),
+                color: AppColors.textSecondary,
                 size: 18,
               ),
               const SizedBox(width: 6),
               Text(
                 'Inicio: ${medication.startDate}',
-                style: const TextStyle(color: Color(0xFF9BA8AB)),
+                style: const TextStyle(color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -281,22 +305,34 @@ class _MedicationListPageState extends State<MedicationListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF06141B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF06141B),
-        foregroundColor: const Color(0xFFCCD0CF),
-        title: const Text('Mis medicamentos'),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 1,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: AppColors.border.withValues(alpha: 0.1),
+        title: const Text(
+          'Mis medicamentos',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 19,
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Actualizar',
             onPressed: _controller.isLoadingMedications
                 ? null
                 : _controller.loadMedications,
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.surface,
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
         label: const Text('Agregar'),
@@ -305,7 +341,9 @@ class _MedicationListPageState extends State<MedicationListPage> {
         animation: _controller,
         builder: (context, _) {
           if (_controller.isLoadingMedications) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            );
           }
 
           if (_controller.medications.isEmpty) {
@@ -313,6 +351,8 @@ class _MedicationListPageState extends State<MedicationListPage> {
           }
 
           return RefreshIndicator(
+            color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             onRefresh: _controller.loadMedications,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 90),

@@ -7,193 +7,151 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/config/api_config.dart';
 import '../../auth/data/auth_storage.dart';
-import '../models/medication.dart';
-import '../models/medication_intake.dart';
-import 'medication_exception.dart';
+import '../models/chat_message.dart';
+import '../models/chat_message_exchange.dart';
+import '../models/chat_session.dart';
+import '../models/chat_session_detail.dart';
+import 'chat_exception.dart';
 
-class MedicationService {
-  MedicationService({http.Client? client, AuthStorage? storage})
+class ChatService {
+  ChatService({http.Client? client, AuthStorage? storage})
     : _client = client ?? http.Client(),
       _storage = storage ?? AuthStorage();
 
   final http.Client _client;
   final AuthStorage _storage;
 
-  Future<List<Medication>> getMedications() async {
+  Future<List<ChatSession>> getSessions() async {
     return _guard(() async {
       final response = await _client
           .get(
-            ApiConfig.endpoint('/medications'),
+            ApiConfig.endpoint('/chat-sessions'),
             headers: await _authHeaders(),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 20));
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
 
-      final items = _extractList(decoded, [
-        'data',
-        'items',
-        'medications',
-        'results',
-      ]);
-
+      final items = _extractList(decoded, ['data', 'items', 'sessions']);
       return items
           .whereType<Map>()
-          .map((item) => Medication.fromJson(item.cast<String, dynamic>()))
+          .map((item) => ChatSession.fromJson(item.cast<String, dynamic>()))
           .toList();
     });
   }
 
-  Future<Medication> getMedicationById(int id) async {
+  Future<ChatSessionDetail> createSession(String content) async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      final decoded = _decodeResponse(response);
-      _throwIfNotSuccess(response, decoded, response.bodyBytes);
-
-      final data = _extractObject(decoded, ['data', 'medication']);
-      if (data.isEmpty) {
-        throw const MedicationException('No se pudo leer el medicamento.');
-      }
-
-      return Medication.fromJson(data);
-    });
-  }
-
-  Future<void> createMedication(MedicationDraft draft) async {
-    return _guard(() async {
-      final endpoint = ApiConfig.endpoint('/medications');
-      final payload = draft.toCreateJson();
-
-      debugPrint('POST $endpoint');
-      debugPrint('POST /medications body: ${jsonEncode(payload)}');
-
       final response = await _client
           .post(
-            endpoint,
+            ApiConfig.endpoint('/chat-sessions'),
             headers: await _authHeaders(),
-            body: jsonEncode(payload),
+            body: jsonEncode({'content': content.trim()}),
           )
-          .timeout(const Duration(seconds: 15));
-
-      debugPrint(
-        'POST /medications response: ${response.statusCode} ${_bodyText(response.bodyBytes)}',
-      );
+          .timeout(const Duration(seconds: 45));
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
+
+      final data = _extractObject(decoded, ['data', 'sessionDetail']);
+      if (data.isEmpty) {
+        throw const ChatException('No se pudo leer la sesion de chat.');
+      }
+
+      return ChatSessionDetail.fromJson(data);
     });
   }
 
-  Future<void> updateMedication(int id, MedicationDraft draft) async {
-    return _guard(() async {
-      final response = await _client
-          .patch(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-            body: jsonEncode(draft.toUpdateJson()),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      final decoded = _decodeResponse(response);
-      _throwIfNotSuccess(response, decoded, response.bodyBytes);
-    });
-  }
-
-  Future<void> deleteMedication(int id) async {
-    return _guard(() async {
-      final response = await _client
-          .delete(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      final decoded = _decodeResponse(response);
-      _throwIfNotSuccess(response, decoded, response.bodyBytes);
-    });
-  }
-
-  Future<List<MedicationIntake>> getTodayIntakes() async {
+  Future<ChatSessionDetail> getSession(int sessionId) async {
     return _guard(() async {
       final response = await _client
           .get(
-            ApiConfig.endpoint('/medications/today-intakes'),
+            ApiConfig.endpoint('/chat-sessions/$sessionId'),
             headers: await _authHeaders(),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 20));
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
 
-      final items = _extractList(decoded, [
-        'data',
-        'items',
-        'intakes',
-        'todayIntakes',
-        'medicationIntakes',
-      ]);
+      final data = _extractObject(decoded, ['data', 'sessionDetail']);
+      if (data.isEmpty) {
+        throw const ChatException('No se pudo leer la sesion de chat.');
+      }
 
+      return ChatSessionDetail.fromJson(data);
+    });
+  }
+
+  Future<List<ChatMessage>> getMessages(int sessionId) async {
+    return _guard(() async {
+      final response = await _client
+          .get(
+            ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
+            headers: await _authHeaders(),
+          )
+          .timeout(const Duration(seconds: 20));
+
+      final decoded = _decodeResponse(response);
+      _throwIfNotSuccess(response, decoded, response.bodyBytes);
+
+      final items = _extractList(decoded, ['data', 'items', 'messages']);
       return items
           .whereType<Map>()
-          .map(
-            (item) => MedicationIntake.fromJson(item.cast<String, dynamic>()),
-          )
+          .map((item) => ChatMessage.fromJson(item.cast<String, dynamic>()))
           .toList();
     });
   }
 
-  Future<void> confirmIntake(int intakeId, {String status = 'taken'}) async {
-    if (status != 'taken' && status != 'omitted') {
-      throw const MedicationException('Estado de toma no valido.');
-    }
-
+  Future<ChatMessageExchange> sendMessage(int sessionId, String content) async {
     return _guard(() async {
       final response = await _client
-          .patch(
-            ApiConfig.endpoint('/medication-intakes/$intakeId/confirm'),
+          .post(
+            ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
             headers: await _authHeaders(),
-            body: jsonEncode({'status': status}),
+            body: jsonEncode({'content': content.trim()}),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
+
+      final data = _extractObject(decoded, ['data', 'exchange']);
+      if (data.isEmpty) {
+        throw const ChatException('No se pudo leer la respuesta del chat.');
+      }
+
+      return ChatMessageExchange.fromJson(data);
     });
   }
 
   Future<T> _guard<T>(Future<T> Function() action) async {
     try {
       return await action();
-    } on MedicationException {
+    } on ChatException {
       rethrow;
     } on http.ClientException catch (error, stackTrace) {
-      debugPrint('MedicationService client error: $error');
+      debugPrint('ChatService client error: $error');
       debugPrintStack(stackTrace: stackTrace);
-      throw MedicationException(
-        'No se pudo completar la solicitud. Verifica que el backend este disponible en ${ApiConfig.baseUrl} y que CORS permita la peticion.',
+      throw ChatException(
+        'No se pudo completar la solicitud. Verifica que el backend este disponible en ${ApiConfig.baseUrl}.',
       );
     } on SocketException {
-      throw const MedicationException('No se pudo conectar con el servidor.');
+      throw const ChatException('No se pudo conectar con el servidor.');
     } on TimeoutException {
-      throw const MedicationException(
-        'La conexion tardo demasiado. Intenta nuevamente.',
+      throw const ChatException(
+        'La respuesta tardo demasiado. Intenta nuevamente.',
       );
     } on FormatException {
-      throw const MedicationException(
+      throw const ChatException(
         'El servidor respondio con datos invalidos.',
       );
     } catch (error, stackTrace) {
-      debugPrint('MedicationService unexpected error: $error');
+      debugPrint('ChatService unexpected error: $error');
       debugPrintStack(stackTrace: stackTrace);
-      throw const MedicationException(
-        'No se pudo completar la solicitud. Revisa la consola para ver el detalle del error.',
+      throw const ChatException(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
       );
     }
   }
@@ -202,10 +160,8 @@ class MedicationService {
     final token = await _storage.getAccessToken();
 
     if (token == null || token.isEmpty) {
-      throw const MedicationException('Sesion no valida. Inicia sesion.');
+      throw const ChatException('Sesion no valida. Inicia sesion.');
     }
-
-    debugPrint('MedicationService auth token available: true');
 
     return {
       'Content-Type': 'application/json',
@@ -223,8 +179,8 @@ class MedicationService {
     try {
       return jsonDecode(body);
     } on FormatException catch (error) {
-      debugPrint('MedicationService invalid JSON response: $error');
-      debugPrint('MedicationService raw response: $body');
+      debugPrint('ChatService invalid JSON response: $error');
+      debugPrint('ChatService raw response: $body');
       if (response.statusCode >= 200 && response.statusCode < 300) {
         rethrow;
       }
@@ -245,7 +201,7 @@ class MedicationService {
       return;
     }
 
-    throw MedicationException(
+    throw ChatException(
       _friendlyMessage(
         response.statusCode,
         decoded,
@@ -263,20 +219,20 @@ class MedicationService {
     }
 
     if (statusCode == 403) {
-      return 'No tienes permisos para realizar esta accion.';
+      return 'No tienes permisos para usar este chat.';
     }
 
     if (statusCode == 404) {
-      return 'No se encontro el recurso solicitado.';
+      return backendMessage ?? 'No se encontro la sesion de chat.';
     }
 
     if (statusCode == 400) {
-      return backendMessage ?? 'Solicitud invalida. Verifica los datos.';
+      return backendMessage ?? 'Escribe un mensaje valido.';
     }
 
     if (statusCode >= 500) {
       return backendMessage ??
-          'El servidor no respondio correctamente. Intenta mas tarde.';
+          'El asistente no respondio correctamente. Intenta mas tarde.';
     }
 
     if (rawBody != null && rawBody.trim().isNotEmpty) {
