@@ -24,11 +24,22 @@ class LocalNotificationService {
 
   LocalNotificationService._internal();
 
-  late final FlutterLocalNotificationsPlugin _notificationsPlugin;
+  FlutterLocalNotificationsPlugin? _notificationsPlugin;
   bool _isInitialized = false;
+
+  bool get _supportsSystemNotifications {
+    return !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS);
+  }
 
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    if (!_supportsSystemNotifications) {
+      _isInitialized = true;
+      return;
+    }
 
     tz_data.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('America/Costa_Rica'));
@@ -70,7 +81,7 @@ class LocalNotificationService {
       iOS: iosSettings,
     );
 
-    await _notificationsPlugin.initialize(
+    await _notificationsPlugin!.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onSelectNotification,
       onDidReceiveBackgroundNotificationResponse:
@@ -88,6 +99,10 @@ class LocalNotificationService {
     required String scheduledTime,
     String? dosage,
   }) async {
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return;
+    }
+
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
           'medication_reminders',
@@ -134,7 +149,7 @@ class LocalNotificationService {
         '\n'
         'Programado: $scheduledTime';
 
-    await _notificationsPlugin.show(
+    await _notificationsPlugin!.show(
       id,
       title,
       body,
@@ -150,6 +165,10 @@ class LocalNotificationService {
     required String scheduledTime,
     String? dosage,
   }) async {
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return;
+    }
+
     final notificationDate = _toLocalNotificationDate(scheduledAt);
     if (!notificationDate.isAfter(tz.TZDateTime.now(tz.local))) {
       return;
@@ -201,7 +220,7 @@ class LocalNotificationService {
         '\n'
         'Programado: $scheduledTime';
 
-    await _notificationsPlugin.zonedSchedule(
+    await _notificationsPlugin!.zonedSchedule(
       id,
       title,
       body,
@@ -215,15 +234,27 @@ class LocalNotificationService {
   }
 
   Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id);
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return;
+    }
+
+    await _notificationsPlugin!.cancel(id);
   }
 
   Future<void> cancelAllNotifications() async {
-    await _notificationsPlugin.cancelAll();
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return;
+    }
+
+    await _notificationsPlugin!.cancelAll();
   }
 
   Future<Set<int>> pendingMedicationReminderIds() async {
-    final pendingRequests = await _notificationsPlugin
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return {};
+    }
+
+    final pendingRequests = await _notificationsPlugin!
         .pendingNotificationRequests();
 
     return pendingRequests
@@ -284,7 +315,11 @@ class LocalNotificationService {
   }
 
   Future<void> _requestRuntimePermissions() async {
-    final androidImplementation = _notificationsPlugin
+    if (!_supportsSystemNotifications || _notificationsPlugin == null) {
+      return;
+    }
+
+    final androidImplementation = _notificationsPlugin!
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();

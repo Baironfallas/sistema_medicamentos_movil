@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../data/auth_service.dart';
 import '../../models/auth_user.dart';
 import '../../../medications/presentation/widgets/pending_intakes_alert.dart';
+import '../../../medications/services/intake_notification_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +19,12 @@ class _HomePageState extends State<HomePage> {
 
   late final Future<AuthUser?> _user = _authService.getAuthenticatedUser();
   bool _isLoggingOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    IntakeNotificationManager().start();
+  }
 
   Future<void> _confirmLogout() async {
     final shouldLogout = await showDialog<bool>(
@@ -69,6 +76,7 @@ class _HomePageState extends State<HomePage> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final serverLogoutSucceeded = await _authService.logout();
+    await IntakeNotificationManager().stop();
 
     if (!mounted) {
       return;

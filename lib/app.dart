@@ -8,6 +8,7 @@ import 'features/auth/presentation/pages/register_page.dart';
 import 'features/chat/presentation/pages/chat_sessions_page.dart';
 import 'features/medications/presentation/pages/medication_list_page.dart';
 import 'features/medications/presentation/pages/today_intakes_page.dart';
+import 'features/medications/presentation/widgets/in_app_intake_notification_host.dart';
 import 'features/medications/services/intake_notification_manager.dart';
 
 class MedicineReminderApp extends StatelessWidget {
@@ -33,6 +34,14 @@ class MedicineReminderApp extends StatelessWidget {
         medicationsRoute: (_) => const MedicationListPage(),
         todayIntakesRoute: (_) => const TodayIntakesPage(),
         chatRoute: (_) => const ChatSessionsPage(),
+      },
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+            const InAppIntakeNotificationHost(),
+          ],
+        );
       },
       home: const AuthGate(),
     );
