@@ -158,11 +158,7 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.primary,
-              size: 20,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
           ],
         ),
       ),
