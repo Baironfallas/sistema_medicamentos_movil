@@ -60,9 +60,12 @@ class AuthFormLayout extends StatelessWidget {
     final baseHeaderHeight = headerHeight ?? (visualRefresh ? 110 : 64);
     final labelPillHeight = headerLabel == null ? 0.0 : 24.0;
     final requiredHeaderHeight = headerLabel == null
-      ? baseHeaderHeight
-      : iconContainerSize + 8 + labelPillHeight + 12;
-    final resolvedHeaderHeight = math.max(baseHeaderHeight, requiredHeaderHeight);
+        ? baseHeaderHeight
+        : iconContainerSize + 8 + labelPillHeight + 12;
+    final resolvedHeaderHeight = math.max(
+      baseHeaderHeight,
+      requiredHeaderHeight,
+    );
     final headerGradient = visualRefresh
         ? LinearGradient(
             begin: Alignment.topLeft,
@@ -72,10 +75,7 @@ class AuthFormLayout extends StatelessWidget {
                     AppColors.primary.withValues(alpha: 0.2),
                     AppColors.primary.withValues(alpha: 0.08),
                   ]
-                : const [
-                    Color(0xFF14B8A6),
-                    Color(0xFF5EEAD4),
-                  ],
+                : const [Color(0xFF14B8A6), Color(0xFF5EEAD4)],
           )
         : null;
     final backgroundDecoration = BoxDecoration(color: AppColors.background);
@@ -108,7 +108,7 @@ class AuthFormLayout extends StatelessWidget {
                                 : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                             child: Container(
                               width: visualRefresh ? double.infinity : 64,
-                                height: resolvedHeaderHeight,
+                              height: resolvedHeaderHeight,
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withValues(alpha: 0.1),
                                 gradient: headerGradient,
@@ -190,8 +190,9 @@ class AuthFormLayout extends StatelessWidget {
                                             color: AppColors.surface.withValues(
                                               alpha: 0.95,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(999),
+                                            borderRadius: BorderRadius.circular(
+                                              999,
+                                            ),
                                             border: Border.all(
                                               color: AppColors.primary
                                                   .withValues(alpha: 0.16),
@@ -381,10 +382,7 @@ class AuthFormLayout extends StatelessWidget {
               child: Stack(children: [content]),
             )
           : visualRefresh
-          ? Container(
-              decoration: backgroundDecoration,
-              child: content,
-            )
+          ? Container(decoration: backgroundDecoration, child: content)
           : content,
     );
   }
