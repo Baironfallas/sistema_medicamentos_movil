@@ -22,28 +22,24 @@ class PrimaryLoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final overlayColor = MaterialStateProperty.resolveWith<Color?>(
-      (states) {
-        if (states.contains(MaterialState.pressed)) {
-          return Colors.white.withValues(alpha: 0.24);
-        }
-        if (states.contains(MaterialState.hovered)) {
-          return Colors.white.withValues(alpha: 0.12);
-        }
-        return null;
-      },
-    );
-    final elevation = MaterialStateProperty.resolveWith<double>(
-      (states) {
-        if (states.contains(MaterialState.pressed)) {
-          return 0;
-        }
-        if (states.contains(MaterialState.hovered)) {
-          return 6;
-        }
-        return 4;
-      },
-    );
+    final overlayColor = MaterialStateProperty.resolveWith<Color?>((states) {
+      if (states.contains(MaterialState.pressed)) {
+        return Colors.white.withValues(alpha: 0.24);
+      }
+      if (states.contains(MaterialState.hovered)) {
+        return Colors.white.withValues(alpha: 0.12);
+      }
+      return null;
+    });
+    final elevation = MaterialStateProperty.resolveWith<double>((states) {
+      if (states.contains(MaterialState.pressed)) {
+        return 0;
+      }
+      if (states.contains(MaterialState.hovered)) {
+        return 6;
+      }
+      return 4;
+    });
     final shadowColor = AppColors.primary.withValues(alpha: 0.38);
 
     if (useGradient) {

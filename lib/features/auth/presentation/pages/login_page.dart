@@ -221,10 +221,7 @@ class _LoginPageState extends State<LoginPage> {
               isLoading: _isLoading,
               onPressed: _submit,
               useGradient: true,
-              gradientColors: const [
-                Color(0xFF14B8A6),
-                Color(0xFF5EEAD4),
-              ],
+              gradientColors: const [Color(0xFF14B8A6), Color(0xFF5EEAD4)],
             ),
             const SizedBox(height: 16),
             Row(
