@@ -6,27 +6,33 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/config/api_config.dart';
+import '../../auth/data/auth_service.dart';
 import '../../auth/data/auth_storage.dart';
 import '../models/medication.dart';
 import '../models/medication_intake.dart';
 import 'medication_exception.dart';
 
 class MedicationService {
-  MedicationService({http.Client? client, AuthStorage? storage})
-    : _client = client ?? http.Client(),
-      _storage = storage ?? AuthStorage();
+  MedicationService({
+    http.Client? client,
+    AuthStorage? storage,
+    AuthService? authService,
+  }) : _client = client ?? http.Client(),
+       _storage = storage ?? AuthStorage() {
+    _authService = authService ?? AuthService(client: _client, storage: _storage);
+  }
 
   final http.Client _client;
   final AuthStorage _storage;
+  late final AuthService _authService;
 
   Future<List<Medication>> getMedications() async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/medications'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(ApiConfig.endpoint('/medications'), headers: headers)
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -47,12 +53,11 @@ class MedicationService {
 
   Future<Medication> getMedicationById(int id) async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(ApiConfig.endpoint('/medications/$id'), headers: headers)
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -74,13 +79,11 @@ class MedicationService {
       debugPrint('POST $endpoint');
       debugPrint('POST /medications body: ${jsonEncode(payload)}');
 
-      final response = await _client
-          .post(
-            endpoint,
-            headers: await _authHeaders(),
-            body: jsonEncode(payload),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .post(endpoint, headers: headers, body: jsonEncode(payload))
+            .timeout(const Duration(seconds: 15)),
+      );
 
       debugPrint(
         'POST /medications response: ${response.statusCode} ${_bodyText(response.bodyBytes)}',
@@ -93,13 +96,15 @@ class MedicationService {
 
   Future<void> updateMedication(int id, MedicationDraft draft) async {
     return _guard(() async {
-      final response = await _client
-          .patch(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-            body: jsonEncode(draft.toUpdateJson()),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .patch(
+              ApiConfig.endpoint('/medications/$id'),
+              headers: headers,
+              body: jsonEncode(draft.toUpdateJson()),
+            )
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -108,12 +113,11 @@ class MedicationService {
 
   Future<void> deleteMedication(int id) async {
     return _guard(() async {
-      final response = await _client
-          .delete(
-            ApiConfig.endpoint('/medications/$id'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .delete(ApiConfig.endpoint('/medications/$id'), headers: headers)
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -122,12 +126,14 @@ class MedicationService {
 
   Future<List<MedicationIntake>> getTodayIntakes() async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/medications/today-intakes'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(
+              ApiConfig.endpoint('/medications/today-intakes'),
+              headers: headers,
+            )
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -155,13 +161,15 @@ class MedicationService {
     }
 
     return _guard(() async {
-      final response = await _client
-          .patch(
-            ApiConfig.endpoint('/medication-intakes/$intakeId/confirm'),
-            headers: await _authHeaders(),
-            body: jsonEncode({'status': status}),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .patch(
+              ApiConfig.endpoint('/medication-intakes/$intakeId/confirm'),
+              headers: headers,
+              body: jsonEncode({'status': status}),
+            )
+            .timeout(const Duration(seconds: 15)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -212,6 +220,22 @@ class MedicationService {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token',
     };
+  }
+
+  Future<http.Response> _sendWithAuthRetry(
+    Future<http.Response> Function(Map<String, String> headers) request,
+  ) async {
+    final response = await request(await _authHeaders());
+    if (response.statusCode != 401) {
+      return response;
+    }
+
+    final refreshed = await _authService.refreshSession();
+    if (!refreshed) {
+      return response;
+    }
+
+    return request(await _authHeaders());
   }
 
   dynamic _decodeResponse(http.Response response) {
