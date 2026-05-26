@@ -22,6 +22,30 @@ class PrimaryLoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final overlayColor = MaterialStateProperty.resolveWith<Color?>(
+      (states) {
+        if (states.contains(MaterialState.pressed)) {
+          return Colors.white.withValues(alpha: 0.24);
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return Colors.white.withValues(alpha: 0.12);
+        }
+        return null;
+      },
+    );
+    final elevation = MaterialStateProperty.resolveWith<double>(
+      (states) {
+        if (states.contains(MaterialState.pressed)) {
+          return 0;
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return 6;
+        }
+        return 4;
+      },
+    );
+    final shadowColor = AppColors.primary.withValues(alpha: 0.38);
+
     if (useGradient) {
       return Container(
         width: double.infinity,
@@ -35,19 +59,18 @@ class PrimaryLoadingButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
         ),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            disabledBackgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            elevation: 0,
-            padding: EdgeInsets.zero,
-            minimumSize: const Size.fromHeight(56),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            overlayColor: overlayColor,
+            elevation: elevation,
+            shadowColor: MaterialStateProperty.all(shadowColor),
+            padding: MaterialStateProperty.all(EdgeInsets.zero),
+            minimumSize: MaterialStateProperty.all(const Size.fromHeight(56)),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
             ),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            textStyle: MaterialStateProperty.all(
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           onPressed: isLoading ? null : onPressed,
@@ -83,11 +106,18 @@ class PrimaryLoadingButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        minimumSize: const Size.fromHeight(56),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(AppColors.primary),
+        overlayColor: overlayColor,
+        elevation: elevation,
+        shadowColor: MaterialStateProperty.all(shadowColor),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        ),
+        minimumSize: MaterialStateProperty.all(const Size.fromHeight(56)),
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(vertical: 16),
+        ),
       ),
       onPressed: isLoading ? null : onPressed,
       child: AnimatedSwitcher(
