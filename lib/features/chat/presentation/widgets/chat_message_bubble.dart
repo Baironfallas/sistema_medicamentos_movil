@@ -14,93 +14,82 @@ class ChatMessageBubble extends StatelessWidget {
     final bubbleColor = isUser ? AppColors.primary : AppColors.surface;
     final textColor = isUser ? AppColors.surface : AppColors.textPrimary;
     final alignment = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-    final radius = BorderRadius.only(
-      topLeft: const Radius.circular(18),
-      topRight: const Radius.circular(18),
-      bottomLeft: Radius.circular(isUser ? 18 : 4),
-      bottomRight: Radius.circular(isUser ? 4 : 18),
-    );
+    final bubbleRadius = BorderRadius.circular(18);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: alignment,
-        children: [
-          Row(
-            mainAxisAlignment: isUser
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxBubbleWidth = constraints.maxWidth * 0.74;
+
+        final bubble = Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: bubbleColor,
+            borderRadius: bubbleRadius,
+            border: isUser
+                ? null
+                : Border.all(color: AppColors.border, width: 1.0),
+          ),
+          child: Text(
+            message.content,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 15,
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: Column(
+            crossAxisAlignment: alignment,
             children: [
-              if (!isUser) ...[
-                const _Avatar(
-                  icon: Icons.smart_toy_outlined,
-                  color: AppColors.aiColor,
-                ),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 320),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 11,
+              Row(
+                mainAxisAlignment: isUser
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isUser) ...[
+                    const _Avatar(
+                      icon: Icons.smart_toy_outlined,
+                      color: AppColors.aiColor,
                     ),
-                    decoration: BoxDecoration(
-                      color: bubbleColor,
-                      borderRadius: radius,
-                      border: isUser
-                          ? null
-                          : Border.all(color: AppColors.border, width: 1.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                    const SizedBox(width: 12),
+                    Expanded(child: bubble),
+                  ] else ...[
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: maxBubbleWidth),
+                        child: bubble,
+                      ),
                     ),
+                  ],
+                ],
+              ),
+              if (message.timeLabel.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Align(
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: isUser ? 0 : 44),
                     child: Text(
-                      message.content,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 15,
-                        height: 1.36,
+                      message.timeLabel,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (isUser) ...[
-                const SizedBox(width: 8),
-                const _Avatar(
-                  icon: Icons.person_outline,
-                  color: AppColors.primary,
-                ),
               ],
             ],
           ),
-          if (message.timeLabel.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Padding(
-              padding: EdgeInsets.only(
-                left: isUser ? 0 : 40,
-                right: isUser ? 40 : 0,
-              ),
-              child: Text(
-                message.timeLabel,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 }
