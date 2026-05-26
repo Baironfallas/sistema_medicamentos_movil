@@ -13,7 +13,9 @@ class ChatMessageBubble extends StatelessWidget {
     final isUser = message.isUser;
     final bubbleColor = isUser ? AppColors.primary : AppColors.surface;
     final textColor = isUser ? AppColors.surface : AppColors.textPrimary;
-    final alignment = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final alignment = isUser
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
     final bubbleRadius = BorderRadius.circular(18);
 
     return LayoutBuilder(
@@ -71,8 +73,9 @@ class ChatMessageBubble extends StatelessWidget {
               if (message.timeLabel.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Align(
-                  alignment:
-                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Padding(
                     padding: EdgeInsets.only(left: isUser ? 0 : 44),
                     child: Text(
