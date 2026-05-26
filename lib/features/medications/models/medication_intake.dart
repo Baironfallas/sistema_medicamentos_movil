@@ -43,10 +43,10 @@ class MedicationIntake {
     );
 
     final name =
-      _string(json['medicationName']) ??
-      _string(json['name']) ??
-      _string(medicationMap['name']) ??
-      'Toma #$id';
+        _string(json['medicationName']) ??
+        _string(json['name']) ??
+        _string(medicationMap['name']) ??
+        'Toma #$id';
 
     final statusText =
         _string(json['status']) ??
@@ -223,9 +223,7 @@ DateTime? _datePartsFromLabel(String? value) {
   }
 
   final normalized = value.trim();
-  final isoMatch = RegExp(
-    r'^(\d{4})-(\d{2})-(\d{2})$',
-  ).firstMatch(normalized);
+  final isoMatch = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(normalized);
   if (isoMatch != null) {
     return DateTime(
       int.parse(isoMatch.group(1)!),

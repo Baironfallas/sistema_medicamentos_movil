@@ -157,8 +157,8 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
     final respondedText = respondedTime == null
         ? null
         : (respondedDate == null
-            ? respondedTime
-            : '$respondedTime · $respondedDate');
+              ? respondedTime
+              : '$respondedTime · $respondedDate');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -258,10 +258,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                infoRow(
-                  icon: Icons.schedule_outlined,
-                  text: scheduledText,
-                ),
+                infoRow(icon: Icons.schedule_outlined, text: scheduledText),
                 if (respondedText != null) ...[
                   const SizedBox(height: 8),
                   infoRow(
