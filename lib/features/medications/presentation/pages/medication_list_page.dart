@@ -317,10 +317,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                infoRow(
-                  icon: Icons.schedule_outlined,
-                  text: scheduleText,
-                ),
+                infoRow(icon: Icons.schedule_outlined, text: scheduleText),
                 const SizedBox(height: 8),
                 infoRow(
                   icon: Icons.medication_liquid_outlined,
