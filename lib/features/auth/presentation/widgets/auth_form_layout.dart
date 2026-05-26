@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -54,6 +55,30 @@ class AuthFormLayout extends StatelessWidget {
             bottomRight: Radius.circular(24),
           )
         : BorderRadius.circular(24);
+    final iconSize = headerIconSize ?? (visualRefresh ? 38 : 34);
+    final iconContainerSize = iconSize + 12;
+    final baseHeaderHeight = headerHeight ?? (visualRefresh ? 110 : 64);
+    final labelPillHeight = headerLabel == null ? 0.0 : 24.0;
+    final requiredHeaderHeight = headerLabel == null
+      ? baseHeaderHeight
+      : iconContainerSize + 8 + labelPillHeight + 12;
+    final resolvedHeaderHeight = math.max(baseHeaderHeight, requiredHeaderHeight);
+    final headerGradient = visualRefresh
+        ? LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: darkDecorativeBackground
+                ? [
+                    AppColors.primary.withValues(alpha: 0.2),
+                    AppColors.primary.withValues(alpha: 0.08),
+                  ]
+                : const [
+                    Color(0xFF14B8A6),
+                    Color(0xFF5EEAD4),
+                  ],
+          )
+        : null;
+    final backgroundDecoration = BoxDecoration(color: AppColors.background);
 
     final content = SafeArea(
       child: LayoutBuilder(
@@ -83,23 +108,10 @@ class AuthFormLayout extends StatelessWidget {
                                 : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                             child: Container(
                               width: visualRefresh ? double.infinity : 64,
-                              height:
-                                  headerHeight ?? (visualRefresh ? 110 : 64),
+                                height: resolvedHeaderHeight,
                               decoration: BoxDecoration(
-                                color: darkDecorativeBackground
-                                    ? AppColors.primary.withValues(alpha: 0.1)
-                                    : AppColors.primary.withValues(alpha: 0.1),
-                                gradient:
-                                    !darkDecorativeBackground && visualRefresh
-                                    ? LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          const Color(0xFF14B8A6),
-                                          const Color(0xFF5EEAD4),
-                                        ],
-                                      )
-                                    : null,
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                gradient: headerGradient,
                                 borderRadius: darkDecorativeBackground
                                     ? null
                                     : headerRadius,
@@ -139,34 +151,61 @@ class AuthFormLayout extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.medication_liquid_outlined,
-                                          color: darkDecorativeBackground
-                                              ? AppColors.primary
-                                              : AppColors.primary,
-                                          size:
-                                              headerIconSize ??
-                                              (visualRefresh ? 38 : 34),
+                                        Container(
+                                          width: iconContainerSize,
+                                          height: iconContainerSize,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.surface.withValues(
+                                              alpha: 0.9,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              iconContainerSize / 2,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.18),
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.2),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Icon(
+                                            Icons.medication_liquid_outlined,
+                                            color: AppColors.primary,
+                                            size: iconSize,
+                                          ),
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          headerLabel!,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: darkDecorativeBackground
-                                                ? AppColors.textPrimary
-                                                : AppColors.primary,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w800,
-                                            shadows: !darkDecorativeBackground
-                                                ? const [
-                                                    Shadow(
-                                                      color: Color(0x660F172A),
-                                                      blurRadius: 6,
-                                                      offset: Offset(0, 1),
-                                                    ),
-                                                  ]
-                                                : null,
+                                        const SizedBox(height: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.surface.withValues(
+                                              alpha: 0.95,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(999),
+                                            border: Border.all(
+                                              color: AppColors.primary
+                                                  .withValues(alpha: 0.16),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            headerLabel!,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: AppColors.textPrimary,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 0.2,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -338,12 +377,12 @@ class AuthFormLayout extends StatelessWidget {
           ? Container(
               width: double.infinity,
               height: double.infinity,
-              decoration: const BoxDecoration(color: AppColors.background),
+              decoration: backgroundDecoration,
               child: Stack(children: [content]),
             )
           : visualRefresh
           ? Container(
-              decoration: const BoxDecoration(color: AppColors.background),
+              decoration: backgroundDecoration,
               child: content,
             )
           : content,
