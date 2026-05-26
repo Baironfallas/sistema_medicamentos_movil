@@ -10,6 +10,9 @@ class MedicationIntake {
     this.timeLabel,
     this.dateLabel,
     this.scheduledAt,
+    this.respondedAt,
+    this.quantityTaken,
+    this.remainingPills,
     this.dosage,
   });
 
@@ -21,11 +24,17 @@ class MedicationIntake {
   final String? timeLabel;
   final String? dateLabel;
   final String? scheduledAt;
+  final String? respondedAt;
+  final int? quantityTaken;
+  final int? remainingPills;
   final String? dosage;
 
   DateTime? get scheduledDateTime =>
       parseServerDateTime(scheduledAt) ??
       _dateTimeFromLabels(dateLabel, timeLabel);
+
+  String? get respondedTimeLabel => formatServerTime(respondedAt);
+  String? get respondedDateLabel => formatServerDate(respondedAt);
 
   factory MedicationIntake.fromJson(Map<String, dynamic> json) {
     final id = _toInt(json['intakeId'] ?? json['id']);
@@ -35,6 +44,7 @@ class MedicationIntake {
 
     final name =
         _string(json['medicationName']) ??
+        _string(json['name']) ??
         _string(medicationMap['name']) ??
         'Toma #$id';
 
@@ -61,6 +71,8 @@ class MedicationIntake {
         _string(json['scheduledTime']) ??
         _string(json['time']) ??
         _string(json['intakeTime']);
+
+    final respondedAt = _string(json['respondedAt']);
 
     final hour =
         _string(json['hour']) ??
@@ -96,6 +108,9 @@ class MedicationIntake {
       timeLabel: timeLabel,
       dateLabel: dateLabel,
       scheduledAt: scheduledAt,
+      respondedAt: respondedAt,
+      quantityTaken: _toIntNullable(json['quantityTaken']),
+      remainingPills: _toIntNullable(json['remainingPills']),
       dosage: dosage,
     );
   }
@@ -108,6 +123,9 @@ class MedicationIntake {
     String? timeLabel,
     String? dateLabel,
     String? scheduledAt,
+    String? respondedAt,
+    int? quantityTaken,
+    int? remainingPills,
     String? dosage,
   }) {
     return MedicationIntake(
@@ -119,6 +137,9 @@ class MedicationIntake {
       timeLabel: timeLabel ?? this.timeLabel,
       dateLabel: dateLabel ?? this.dateLabel,
       scheduledAt: scheduledAt ?? this.scheduledAt,
+      respondedAt: respondedAt ?? this.respondedAt,
+      quantityTaken: quantityTaken ?? this.quantityTaken,
+      remainingPills: remainingPills ?? this.remainingPills,
       dosage: dosage ?? this.dosage,
     );
   }
@@ -202,9 +223,7 @@ DateTime? _datePartsFromLabel(String? value) {
   }
 
   final normalized = value.trim();
-  final isoMatch = RegExp(
-    r'^(\d{4})-(\d{2})-(\d{2})$',
-  ).firstMatch(normalized);
+  final isoMatch = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(normalized);
   if (isoMatch != null) {
     return DateTime(
       int.parse(isoMatch.group(1)!),

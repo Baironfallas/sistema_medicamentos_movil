@@ -19,6 +19,8 @@ class AuthService {
     : _client = client ?? http.Client(),
       _storage = storage ?? AuthStorage();
 
+  static Future<bool>? _refreshInFlight;
+
   final http.Client _client;
   final AuthStorage _storage;
 
@@ -149,6 +151,74 @@ class AuthService {
     }
 
     return serverLogoutSucceeded;
+  }
+
+  Future<bool> refreshSession() {
+    final inFlight = _refreshInFlight;
+    if (inFlight != null) {
+      return inFlight;
+    }
+
+    final operation = _refreshSession();
+    _refreshInFlight = operation;
+    operation.whenComplete(() {
+      if (identical(_refreshInFlight, operation)) {
+        _refreshInFlight = null;
+      }
+    });
+
+    return operation;
+  }
+
+  Future<bool> _refreshSession() async {
+    try {
+      final refreshToken = await _storage.getRefreshToken();
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        await _storage.clearSession();
+        return false;
+      }
+
+      final response = await _client
+          .post(
+            ApiConfig.endpoint('/auth/refresh'),
+            headers: _jsonHeaders,
+            body: jsonEncode(
+              LogoutRequest(refreshToken: refreshToken).toJson(),
+            ),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final decoded = _decodeObject(response.bodyBytes);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final loginResponse = LoginResponse.fromJson(decoded);
+        _validateTokens(loginResponse.accessToken, loginResponse.refreshToken);
+        await _storage.saveTokens(
+          loginResponse.accessToken,
+          loginResponse.refreshToken,
+        );
+        await _storage.saveUser(loginResponse.user);
+        return true;
+      }
+
+      if (response.statusCode == 400 ||
+          response.statusCode == 401 ||
+          response.statusCode == 403) {
+        await _storage.clearSession();
+      }
+
+      return false;
+    } on SocketException {
+      return false;
+    } on TimeoutException {
+      return false;
+    } on FormatException {
+      await _storage.clearSession();
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<String?> getAccessToken() {

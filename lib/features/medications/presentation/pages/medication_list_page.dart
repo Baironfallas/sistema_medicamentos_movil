@@ -167,135 +167,179 @@ class _MedicationListPageState extends State<MedicationListPage> {
         ? 'Sin horarios'
         : schedules.join(', ');
 
+    Widget actionButton({
+      required IconData icon,
+      required String tooltip,
+      required Color color,
+      required VoidCallback? onPressed,
+    }) {
+      return Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.22)),
+        ),
+        child: IconButton(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          padding: EdgeInsets.zero,
+          icon: Icon(icon, color: color, size: 18),
+        ),
+      );
+    }
+
+    Widget infoRow({required IconData icon, required String text}) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.textSecondary, size: 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.0),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.9)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
+          Container(
+            height: 4,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.85),
+                  AppColors.aiColor.withValues(alpha: 0.7),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      medication.name,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.medication_outlined,
+                        color: AppColors.primary,
+                        size: 20,
                       ),
                     ),
-                    if (medication.dose != null &&
-                        medication.dose!.trim().isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        'Dosis: ${medication.dose}',
-                        style: const TextStyle(color: AppColors.textSecondary),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            medication.name,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (medication.dose != null &&
+                              medication.dose!.trim().isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Dosis: ${medication.dose}',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
+                    ),
+                    actionButton(
+                      tooltip: 'Editar',
+                      icon: Icons.edit_outlined,
+                      color: AppColors.secondary,
+                      onPressed: () => _openForm(medication: medication),
+                    ),
+                    const SizedBox(width: 8),
+                    actionButton(
+                      tooltip: 'Eliminar',
+                      icon: Icons.delete_outline,
+                      color: AppColors.error,
+                      onPressed: _controller.isDeleting
+                          ? null
+                          : () => _confirmDelete(medication),
+                    ),
                   ],
                 ),
-              ),
-              IconButton(
-                tooltip: 'Editar',
-                onPressed: () => _openForm(medication: medication),
-                icon: const Icon(
-                  Icons.edit_outlined,
-                  color: AppColors.secondary,
+                const SizedBox(height: 14),
+                infoRow(icon: Icons.schedule_outlined, text: scheduleText),
+                const SizedBox(height: 8),
+                infoRow(
+                  icon: Icons.medication_liquid_outlined,
+                  text:
+                      'Cantidad: ${medication.quantityPerIntake} | Total: ${medication.totalPills}',
                 ),
-              ),
-              IconButton(
-                tooltip: 'Eliminar',
-                onPressed: _controller.isDeleting
-                    ? null
-                    : () => _confirmDelete(medication),
-                icon: const Icon(Icons.delete_outline, color: AppColors.error),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(
-                Icons.schedule_outlined,
-                color: AppColors.textSecondary,
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  scheduleText,
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.medication_liquid_outlined,
-                color: AppColors.textSecondary,
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  'Cantidad: ${medication.quantityPerIntake} | Total: ${medication.totalPills}',
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-            ],
-          ),
-          if (medication.pillsRemaining != null ||
-              medication.daysRemaining != null) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(
-                  Icons.inventory_2_outlined,
-                  color: AppColors.textSecondary,
-                  size: 18,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Restantes: ${medication.pillsRemaining ?? '-'} | Dias: ${medication.daysRemaining ?? '-'}',
-                    style: const TextStyle(color: AppColors.textSecondary),
+                if (medication.pillsRemaining != null ||
+                    medication.daysRemaining != null) ...[
+                  const SizedBox(height: 8),
+                  infoRow(
+                    icon: Icons.inventory_2_outlined,
+                    text:
+                        'Restantes: ${medication.pillsRemaining ?? '-'} | Dias: ${medication.daysRemaining ?? '-'}',
                   ),
+                ],
+                const SizedBox(height: 8),
+                infoRow(
+                  icon: Icons.event_outlined,
+                  text: 'Inicio: ${medication.startDate}',
                 ),
               ],
             ),
-          ],
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.event_outlined,
-                color: AppColors.textSecondary,
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Inicio: ${medication.startDate}',
-                style: const TextStyle(color: AppColors.textSecondary),
-              ),
-            ],
           ),
         ],
       ),

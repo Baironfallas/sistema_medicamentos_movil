@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/config/api_config.dart';
+import '../../auth/data/auth_service.dart';
 import '../../auth/data/auth_storage.dart';
 import '../models/chat_message.dart';
 import '../models/chat_message_exchange.dart';
@@ -14,21 +15,26 @@ import '../models/chat_session_detail.dart';
 import 'chat_exception.dart';
 
 class ChatService {
-  ChatService({http.Client? client, AuthStorage? storage})
-    : _client = client ?? http.Client(),
-      _storage = storage ?? AuthStorage();
+  ChatService({
+    http.Client? client,
+    AuthStorage? storage,
+    AuthService? authService,
+  }) : _client = client ?? http.Client(),
+       _storage = storage ?? AuthStorage() {
+    _authService = authService ?? AuthService(client: _client, storage: _storage);
+  }
 
   final http.Client _client;
   final AuthStorage _storage;
+  late final AuthService _authService;
 
   Future<List<ChatSession>> getSessions() async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/chat-sessions'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 20));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(ApiConfig.endpoint('/chat-sessions'), headers: headers)
+            .timeout(const Duration(seconds: 20)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -43,13 +49,15 @@ class ChatService {
 
   Future<ChatSessionDetail> createSession(String content) async {
     return _guard(() async {
-      final response = await _client
-          .post(
-            ApiConfig.endpoint('/chat-sessions'),
-            headers: await _authHeaders(),
-            body: jsonEncode({'content': content.trim()}),
-          )
-          .timeout(const Duration(seconds: 45));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .post(
+              ApiConfig.endpoint('/chat-sessions'),
+              headers: headers,
+              body: jsonEncode({'content': content.trim()}),
+            )
+            .timeout(const Duration(seconds: 45)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -65,12 +73,14 @@ class ChatService {
 
   Future<ChatSessionDetail> getSession(int sessionId) async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/chat-sessions/$sessionId'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 20));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(
+              ApiConfig.endpoint('/chat-sessions/$sessionId'),
+              headers: headers,
+            )
+            .timeout(const Duration(seconds: 20)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -86,12 +96,14 @@ class ChatService {
 
   Future<List<ChatMessage>> getMessages(int sessionId) async {
     return _guard(() async {
-      final response = await _client
-          .get(
-            ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
-            headers: await _authHeaders(),
-          )
-          .timeout(const Duration(seconds: 20));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .get(
+              ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
+              headers: headers,
+            )
+            .timeout(const Duration(seconds: 20)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -106,13 +118,15 @@ class ChatService {
 
   Future<ChatMessageExchange> sendMessage(int sessionId, String content) async {
     return _guard(() async {
-      final response = await _client
-          .post(
-            ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
-            headers: await _authHeaders(),
-            body: jsonEncode({'content': content.trim()}),
-          )
-          .timeout(const Duration(seconds: 45));
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .post(
+              ApiConfig.endpoint('/chat-sessions/$sessionId/messages'),
+              headers: headers,
+              body: jsonEncode({'content': content.trim()}),
+            )
+            .timeout(const Duration(seconds: 45)),
+      );
 
       final decoded = _decodeResponse(response);
       _throwIfNotSuccess(response, decoded, response.bodyBytes);
@@ -168,6 +182,22 @@ class ChatService {
       'Accept': 'application/json',
       'Authorization': 'Bearer $token',
     };
+  }
+
+  Future<http.Response> _sendWithAuthRetry(
+    Future<http.Response> Function(Map<String, String> headers) request,
+  ) async {
+    final response = await request(await _authHeaders());
+    if (response.statusCode != 401) {
+      return response;
+    }
+
+    final refreshed = await _authService.refreshSession();
+    if (!refreshed) {
+      return response;
+    }
+
+    return request(await _authHeaders());
   }
 
   dynamic _decodeResponse(http.Response response) {

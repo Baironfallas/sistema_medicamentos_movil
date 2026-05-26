@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       labelText: labelText,
       hintText: hintText,
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: AppColors.background,
       border: OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: const BorderSide(color: AppColors.border, width: 1.0),
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.primary, width: 2.0),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
       ),
       labelStyle: const TextStyle(
         color: AppColors.textSecondary,
@@ -59,7 +59,14 @@ class _LoginPageState extends State<LoginPage> {
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
+      floatingLabelStyle: const TextStyle(
+        color: AppColors.primary,
+        fontFamily: 'Inter',
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
       prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
+      prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       suffixIcon: suffixIcon,
       hintStyle: const TextStyle(
         color: AppColors.textSecondary,
@@ -69,6 +76,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       constraints: const BoxConstraints(minHeight: 56, maxHeight: 60),
+      errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
     );
   }
 
@@ -137,10 +145,13 @@ class _LoginPageState extends State<LoginPage> {
           'Organiza tus tratamientos y mantén el control de tu salud.',
       headerLabel: 'Recordatorios inteligentes para tu salud',
       visualRefresh: true,
-      headerHeight: 102,
-      headerIconSize: 52,
-      headerTitleSpacing: 22,
-      titleFormSpacing: 28,
+      maxWidth: 520,
+      headerHeight: 110,
+      headerIconSize: 56,
+      headerTitleSpacing: 20,
+      titleFormSpacing: 24,
+      cardPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      scrollBottomPadding: 40,
       darkDecorativeBackground: true,
       showTitle: false,
       child: Form(
@@ -209,7 +220,8 @@ class _LoginPageState extends State<LoginPage> {
               label: 'Iniciar sesión',
               isLoading: _isLoading,
               onPressed: _submit,
-              useGradient: false,
+              useGradient: true,
+              gradientColors: const [Color(0xFF14B8A6), Color(0xFF5EEAD4)],
             ),
             const SizedBox(height: 16),
             Row(
@@ -220,6 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 TextButton(

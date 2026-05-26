@@ -402,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                                         Icons.chat_bubble_outline,
                                       ),
                                       label: const Text(
-                                        'Chatbot',
+                                        'Asistente Virtual',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,

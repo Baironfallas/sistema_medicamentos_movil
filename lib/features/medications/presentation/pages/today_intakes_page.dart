@@ -87,117 +87,241 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
         ? AppColors.error
         : AppColors.warning;
 
+    Widget infoRow({required IconData icon, required String text}) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.textSecondary, size: 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget statPill({
+      required IconData icon,
+      required String label,
+      required String value,
+    }) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.textSecondary, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              '$label: ',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final scheduledText = intake.dateLabel != null
+        ? '${intake.timeLabel ?? 'Horario pendiente'} · ${intake.dateLabel}'
+        : (intake.timeLabel ?? 'Horario pendiente');
+
+    final respondedTime = intake.respondedTimeLabel;
+    final respondedDate = intake.respondedDateLabel;
+    final respondedText = respondedTime == null
+        ? null
+        : (respondedDate == null
+              ? respondedTime
+              : '$respondedTime · $respondedDate');
+
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.0),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.9)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  intake.medicationName,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+          Container(
+            height: 4,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: statusColor.withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
+              gradient: LinearGradient(
+                colors: [
+                  statusColor.withValues(alpha: 0.9),
+                  statusColor.withValues(alpha: 0.35),
+                ],
               ),
-            ],
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(
-                Icons.schedule_outlined,
-                color: AppColors.textSecondary,
-                size: 18,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                intake.timeLabel ?? 'Horario pendiente',
-                style: const TextStyle(color: AppColors.textSecondary),
-              ),
-              if (intake.dateLabel != null) ...[
-                const SizedBox(width: 10),
-                Text(
-                  intake.dateLabel!,
-                  style: const TextStyle(color: AppColors.textSecondary),
-                ),
-              ],
-            ],
-          ),
-          if (intake.canConfirm) ...[
-            const SizedBox(height: 12),
-            Row(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: BorderSide(
-                        color: AppColors.error.withValues(alpha: 0.5),
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: statusColor.withValues(alpha: 0.28),
+                        ),
+                      ),
+                      child: Icon(
+                        status == 'taken'
+                            ? Icons.check_circle_outline
+                            : status == 'omitted'
+                            ? Icons.cancel_outlined
+                            : Icons.schedule_outlined,
+                        color: statusColor,
+                        size: 20,
                       ),
                     ),
-                    onPressed: _controller.isConfirming
-                        ? null
-                        : () => _updateIntakeStatus(intake, 'omitted'),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: const Text('Omitida'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.surface,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        intake.medicationName,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                    onPressed: _controller.isConfirming
-                        ? null
-                        : () => _updateIntakeStatus(intake, 'taken'),
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Tomada'),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: statusColor.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Text(
+                        statusLabel,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 14),
+                infoRow(icon: Icons.schedule_outlined, text: scheduledText),
+                if (respondedText != null) ...[
+                  const SizedBox(height: 8),
+                  infoRow(
+                    icon: Icons.check_circle_outline,
+                    text: 'Respondida: $respondedText',
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    statPill(
+                      icon: Icons.medication_liquid_outlined,
+                      label: 'Cantidad',
+                      value: '${intake.quantityTaken ?? 0}',
+                    ),
+                    statPill(
+                      icon: Icons.inventory_2_outlined,
+                      label: 'Restantes',
+                      value: '${intake.remainingPills ?? '-'}',
+                    ),
+                  ],
+                ),
+                if (intake.canConfirm) ...[
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                            side: BorderSide(
+                              color: AppColors.error.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          onPressed: _controller.isConfirming
+                              ? null
+                              : () => _updateIntakeStatus(intake, 'omitted'),
+                          icon: const Icon(Icons.cancel_outlined),
+                          label: const Text('Omitida'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.surface,
+                          ),
+                          onPressed: _controller.isConfirming
+                              ? null
+                              : () => _updateIntakeStatus(intake, 'taken'),
+                          icon: const Icon(Icons.check_circle_outline),
+                          label: const Text('Tomada'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
-          ],
+          ),
         ],
       ),
     );

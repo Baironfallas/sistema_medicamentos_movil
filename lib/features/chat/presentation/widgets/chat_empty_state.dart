@@ -17,10 +17,10 @@ class ChatEmptyState extends StatelessWidget {
               width: 76,
               height: 76,
               decoration: BoxDecoration(
-                color: AppColors.aiColor.withValues(alpha: 0.12),
+                color: AppColors.aiBackground,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.aiColor.withValues(alpha: 0.25),
+                  color: AppColors.aiColor.withValues(alpha: 0.16),
                 ),
               ),
               child: const Icon(
@@ -31,7 +31,7 @@ class ChatEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             const Text(
-              'Asistente de medicamentos',
+              'Asistente Virtual',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textPrimary,
@@ -41,7 +41,7 @@ class ChatEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Consulta sobre tus medicamentos, horarios y recordatorios.',
+              'Consulta dudas sobre medicamentos y salud.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textSecondary,

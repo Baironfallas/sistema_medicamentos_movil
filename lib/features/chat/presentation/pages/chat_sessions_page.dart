@@ -91,7 +91,7 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
                   ),
                   onPressed: () => _openChat(),
                   icon: const Icon(Icons.add_comment_outlined),
-                  label: const Text('Nuevo chat'),
+                  label: const Text('Nuevo asistente'),
                 ),
               ],
             ),
@@ -101,39 +101,32 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
     );
   }
 
-  Widget _buildSessionCard(ChatSession session) {
+  Widget _buildSessionRow(ChatSession session) {
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
       onTap: () => _openChat(session: session),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 14, 18, 14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 1.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+          color: AppColors.background,
+          border: Border(
+            bottom: BorderSide(
+              color: AppColors.border.withValues(alpha: 0.65),
+              width: 0.8,
             ),
-          ],
+          ),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 4,
+              height: 42,
               decoration: BoxDecoration(
-                color: AppColors.aiColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Icon(
-                Icons.chat_bubble_outline,
-                color: AppColors.aiColor,
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(99),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,42 +137,28 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      height: 1.25,
+                      height: 1.22,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.schedule_outlined,
-                        color: AppColors.textSecondary,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          session.lastActivityLabel,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    session.lastActivityLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      height: 1.1,
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textSecondary,
-            ),
+            const SizedBox(width: 10),
+            const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
           ],
         ),
       ),
@@ -193,18 +172,33 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
-        elevation: 1,
+        elevation: 0,
         surfaceTintColor: Colors.transparent,
-        shadowColor: AppColors.border.withValues(alpha: 0.1),
+        shadowColor: Colors.transparent,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: AppColors.border.withValues(alpha: 0.7),
+          ),
+        ),
         title: const Text(
-          'Chatbot',
+          'Asistente Virtual',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w700,
-            fontSize: 19,
+            fontSize: 16,
           ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Nuevo chat',
+            onPressed: () => _openChat(),
+            icon: const Icon(
+              Icons.add_comment_outlined,
+              color: AppColors.primary,
+            ),
+          ),
           IconButton(
             tooltip: 'Actualizar',
             onPressed: _controller.isLoadingSessions
@@ -213,13 +207,6 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
             icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.surface,
-        onPressed: () => _openChat(),
-        icon: const Icon(Icons.add_comment_outlined),
-        label: const Text('Nuevo'),
       ),
       body: AnimatedBuilder(
         animation: _controller,
@@ -239,18 +226,21 @@ class _ChatSessionsPageState extends State<ChatSessionsPage> {
             backgroundColor: AppColors.surface,
             onRefresh: _controller.loadSessions,
             child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 90),
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
               itemCount:
                   _controller.sessions.length +
                   (_controller.sessionsError == null ? 0 : 1),
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => const SizedBox.shrink(),
               itemBuilder: (context, index) {
                 if (_controller.sessionsError != null && index == 0) {
-                  return InfoBanner(message: _controller.sessionsError!);
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                    child: InfoBanner(message: _controller.sessionsError!),
+                  );
                 }
 
                 final offset = _controller.sessionsError == null ? 0 : 1;
-                return _buildSessionCard(_controller.sessions[index - offset]);
+                return _buildSessionRow(_controller.sessions[index - offset]);
               },
             ),
           );
