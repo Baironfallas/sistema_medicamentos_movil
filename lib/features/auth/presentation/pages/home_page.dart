@@ -240,13 +240,16 @@ class _HomePageState extends State<HomePage> {
             }),
             labelTextStyle: WidgetStateProperty.resolveWith((states) {
               return TextStyle(
-                color: const Color(0xFFB0BEC5),
+                color: AppColors.textSecondary,
                 fontSize: 11,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w600,
               );
             }),
             iconTheme: WidgetStateProperty.resolveWith((states) {
-              return IconThemeData(color: const Color(0xFFB0BEC5), size: 22);
+              return const IconThemeData(
+                color: AppColors.textSecondary,
+                size: 22,
+              );
             }),
           ),
           child: NavigationBar(
