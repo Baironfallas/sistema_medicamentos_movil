@@ -174,10 +174,7 @@ class _HomePageState extends State<HomePage> {
                       color: AppColors.primary,
                     ),
                   )
-                : const Icon(
-                    Icons.logout_outlined,
-                    color: Color(0xFF9CA3AF),
-                  ),
+                : const Icon(Icons.logout_outlined, color: Color(0xFF9CA3AF)),
           ),
           const SizedBox(width: 8),
         ],
@@ -317,8 +314,9 @@ class _HomePageState extends State<HomePage> {
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(18),
+                                            borderRadius: BorderRadius.circular(
+                                              18,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.medication_liquid_outlined,
@@ -359,13 +357,15 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFF0FBF9),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           child: const Row(
                                             children: [
                                               Icon(
-                                                Icons.notifications_active_outlined,
+                                                Icons
+                                                    .notifications_active_outlined,
                                                 color: Color(0xFF00BFA5),
                                                 size: 18,
                                               ),
