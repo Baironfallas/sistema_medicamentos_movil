@@ -187,18 +187,12 @@ class _HomePageState extends State<HomePage> {
             decoration: BoxDecoration(
               color: const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: const Color(0xFFE5E7EB),
-                width: 0.5,
-              ),
+              border: Border.all(color: const Color(0xFFE5E7EB), width: 0.5),
             ),
             child: IconButton(
               tooltip: 'Cerrar sesión',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints.tightFor(
-                width: 20,
-                height: 20,
-              ),
+              constraints: const BoxConstraints.tightFor(width: 20, height: 20),
               onPressed: _isLoggingOut ? null : _confirmLogout,
               iconSize: 20,
               icon: _isLoggingOut
@@ -210,10 +204,7 @@ class _HomePageState extends State<HomePage> {
                         color: AppColors.primary,
                       ),
                     )
-                  : const Icon(
-                      Icons.logout_rounded,
-                      color: Color(0xFF9CA3AF),
-                    ),
+                  : const Icon(Icons.logout_rounded, color: Color(0xFF9CA3AF)),
             ),
           ),
         ],
@@ -255,10 +246,7 @@ class _HomePageState extends State<HomePage> {
               );
             }),
             iconTheme: WidgetStateProperty.resolveWith((states) {
-              return IconThemeData(
-                color: const Color(0xFFB0BEC5),
-                size: 22,
-              );
+              return IconThemeData(color: const Color(0xFFB0BEC5), size: 22);
             }),
           ),
           child: NavigationBar(
