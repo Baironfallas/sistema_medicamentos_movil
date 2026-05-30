@@ -118,8 +118,8 @@ class _InAppIntakeNotificationHostState
     final timeLabel = intake.timeLabel ?? 'Horario pendiente';
     final dosageLabel = intake.dosage?.trim();
     final quantityPerIntakeLabel = intake.quantityPerIntake != null
-      ? '${intake.quantityPerIntake} unidad${intake.quantityPerIntake == 1 ? '' : 'es'}'
-      : null;
+        ? '${intake.quantityPerIntake} unidad${intake.quantityPerIntake == 1 ? '' : 'es'}'
+        : null;
 
     return Center(
       key: ValueKey('intake-${intake.id}'),
@@ -131,10 +131,7 @@ class _InAppIntakeNotificationHostState
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: _softPrimary,
-                width: 1.0,
-              ),
+              border: Border.all(color: _softPrimary, width: 1.0),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withValues(alpha: 0.10),
@@ -200,7 +197,8 @@ class _InAppIntakeNotificationHostState
                                   const SizedBox(height: 4),
                                   Text(
                                     [
-                                      if (dosageLabel != null) 'Dosis: $dosageLabel',
+                                      if (dosageLabel != null)
+                                        'Dosis: $dosageLabel',
                                       if (quantityPerIntakeLabel != null)
                                         'Cantidad: $quantityPerIntakeLabel',
                                     ].join(' • '),
@@ -222,7 +220,8 @@ class _InAppIntakeNotificationHostState
                         ],
                       ),
                       const SizedBox(height: 10),
-                      if (dosageLabel != null || quantityPerIntakeLabel != null) ...[
+                      if (dosageLabel != null ||
+                          quantityPerIntakeLabel != null) ...[
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(

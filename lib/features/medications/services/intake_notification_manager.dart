@@ -124,8 +124,7 @@ class IntakeNotificationManager extends ChangeNotifier {
       }
     } catch (error) {
       final message = error.toString();
-      final changed =
-          _todayIntakesError != message || !_hasLoadedTodayIntakes;
+      final changed = _todayIntakesError != message || !_hasLoadedTodayIntakes;
       _todayIntakesError = message;
       _hasLoadedTodayIntakes = true;
       if (changed) {
@@ -164,7 +163,8 @@ class IntakeNotificationManager extends ChangeNotifier {
       final medication = intake.medicationId != null
           ? medicationById[intake.medicationId]
           : null;
-      final fallbackMedication = medication ??
+      final fallbackMedication =
+          medication ??
           medicationByName[_normalizeMedicationKey(intake.medicationName)];
       final resolvedMedication = fallbackMedication;
       if (resolvedMedication == null) {
@@ -174,7 +174,8 @@ class IntakeNotificationManager extends ChangeNotifier {
       return intake.copyWith(
         dosage: intake.dosage ?? resolvedMedication.dose,
         quantityPerIntake:
-            intake.quantityPerIntake ?? resolvedMedication.quantityPerIntake.toInt(),
+            intake.quantityPerIntake ??
+            resolvedMedication.quantityPerIntake.toInt(),
       );
     }).toList();
   }
@@ -183,7 +184,10 @@ class IntakeNotificationManager extends ChangeNotifier {
     return value.trim().toLowerCase();
   }
 
-  Future<bool> updateIntakeStatus(MedicationIntake intake, String status) async {
+  Future<bool> updateIntakeStatus(
+    MedicationIntake intake,
+    String status,
+  ) async {
     if (status != 'taken' && status != 'omitted') {
       return false;
     }
@@ -206,9 +210,7 @@ class IntakeNotificationManager extends ChangeNotifier {
       await refreshScheduledNotifications();
       return true;
     } catch (error) {
-      debugPrint(
-        '[IntakeNotificationManager] Error actualizando toma: $error',
-      );
+      debugPrint('[IntakeNotificationManager] Error actualizando toma: $error');
       return false;
     }
   }
@@ -330,10 +332,7 @@ class IntakeNotificationManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _updateDuePendingIntakes(
-    List<MedicationIntake> intakes,
-    DateTime now,
-  ) {
+  bool _updateDuePendingIntakes(List<MedicationIntake> intakes, DateTime now) {
     final nextDueIds = intakes
         .where((intake) => _isPendingDue(intake, now))
         .map((intake) => intake.id)
@@ -349,10 +348,7 @@ class IntakeNotificationManager extends ChangeNotifier {
     return true;
   }
 
-  void _scheduleNextDueRefresh(
-    List<MedicationIntake> intakes,
-    DateTime now,
-  ) {
+  void _scheduleNextDueRefresh(List<MedicationIntake> intakes, DateTime now) {
     _nextDueTimer?.cancel();
     _nextDueTimer = null;
 

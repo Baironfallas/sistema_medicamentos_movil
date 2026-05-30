@@ -96,8 +96,8 @@ class MedicationIntake {
         _string(medicationMap['dose']);
 
     final quantityPerIntake =
-      _toIntNullable(json['quantityPerIntake']) ??
-      _toIntNullable(medicationMap['quantityPerIntake']);
+        _toIntNullable(json['quantityPerIntake']) ??
+        _toIntNullable(medicationMap['quantityPerIntake']);
 
     return MedicationIntake(
       id: id,
