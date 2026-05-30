@@ -8,7 +8,6 @@ import '../../models/login_request.dart';
 import '../validators/auth_validators.dart';
 import '../widgets/auth_form_layout.dart';
 import '../widgets/auth_message.dart';
-import '../widgets/primary_loading_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,24 +33,26 @@ class _LoginPageState extends State<LoginPage> {
     required IconData prefixIcon,
     Widget? suffixIcon,
   }) {
-    final borderRadius = BorderRadius.circular(16);
+    final borderRadius = BorderRadius.circular(14);
+    const borderColor = Color(0xFFB2DFDB);
+    const focusedColor = Color(0xFF00BFA5);
 
     return InputDecoration(
       labelText: labelText,
       hintText: hintText,
       filled: true,
-      fillColor: AppColors.background,
+      fillColor: const Color(0xFFF8FFFE),
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
+        borderSide: const BorderSide(color: borderColor, width: 1.0),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.border, width: 1.0),
+        borderSide: const BorderSide(color: borderColor, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
+        borderSide: const BorderSide(color: focusedColor, width: 1.5),
       ),
       labelStyle: const TextStyle(
         color: AppColors.textSecondary,
@@ -60,13 +61,11 @@ class _LoginPageState extends State<LoginPage> {
         fontWeight: FontWeight.w500,
       ),
       floatingLabelStyle: const TextStyle(
-        color: AppColors.primary,
+        color: Color(0xFF00BFA5),
         fontFamily: 'Inter',
         fontSize: 13,
         fontWeight: FontWeight.w600,
       ),
-      prefixIcon: Icon(prefixIcon, color: AppColors.textSecondary),
-      prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       suffixIcon: suffixIcon,
       hintStyle: const TextStyle(
         color: AppColors.textSecondary,
@@ -74,9 +73,11 @@ class _LoginPageState extends State<LoginPage> {
         fontFamily: 'Inter',
         fontWeight: FontWeight.w400,
       ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       constraints: const BoxConstraints(minHeight: 56, maxHeight: 60),
       errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
+      prefixIcon: Icon(prefixIcon, color: focusedColor),
+      prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
     );
   }
 
@@ -149,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
       headerHeight: 110,
       headerIconSize: 56,
       headerTitleSpacing: 20,
-      titleFormSpacing: 24,
+      titleFormSpacing: 32,
       cardPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       scrollBottomPadding: 40,
       darkDecorativeBackground: true,
@@ -215,13 +216,61 @@ class _LoginPageState extends State<LoginPage> {
               ),
               validator: AuthValidators.password,
             ),
-            const SizedBox(height: 20),
-            PrimaryLoadingButton(
-              label: 'Iniciar sesión',
-              isLoading: _isLoading,
-              onPressed: _submit,
-              useGradient: true,
-              gradientColors: const [Color(0xFF14B8A6), Color(0xFF5EEAD4)],
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF00BFA5), Color(0xFF00897B)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF00BFA5).withOpacity(0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: _isLoading ? null : _submit,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: _isLoading
+                        ? const SizedBox(
+                            key: ValueKey('loading'),
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.4,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Iniciar sesión',
+                            key: ValueKey('label'),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -230,17 +279,17 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   '¿No tienes cuenta?',
                   style: TextStyle(
-                    color: AppColors.textSecondary,
+                    color: Color(0xFF9CA3AF),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: const Color(0xFF00BFA5),
                     textStyle: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   onPressed: _isLoading
