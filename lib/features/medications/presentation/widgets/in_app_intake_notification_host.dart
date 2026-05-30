@@ -116,6 +116,10 @@ class _InAppIntakeNotificationHostState
     final isUpdating = _updatingIntakeIds.contains(intake.id);
     final medicationLabel = _displayMedicationName(intake);
     final timeLabel = intake.timeLabel ?? 'Horario pendiente';
+    final dosageLabel = intake.dosage?.trim();
+    final quantityPerIntakeLabel = intake.quantityPerIntake != null
+        ? '${intake.quantityPerIntake} unidad${intake.quantityPerIntake == 1 ? '' : 'es'}'
+        : null;
 
     return Center(
       key: ValueKey('intake-${intake.id}'),
@@ -127,10 +131,7 @@ class _InAppIntakeNotificationHostState
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: _softPrimary,
-                width: 1.0,
-              ),
+              border: Border.all(color: _softPrimary, width: 1.0),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withValues(alpha: 0.10),
@@ -191,6 +192,26 @@ class _InAppIntakeNotificationHostState
                                     height: 1.2,
                                   ),
                                 ),
+                                if (dosageLabel != null ||
+                                    quantityPerIntakeLabel != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    [
+                                      if (dosageLabel != null)
+                                        'Dosis: $dosageLabel',
+                                      if (quantityPerIntakeLabel != null)
+                                        'Cantidad: $quantityPerIntakeLabel',
+                                    ].join(' • '),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -199,6 +220,34 @@ class _InAppIntakeNotificationHostState
                         ],
                       ),
                       const SizedBox(height: 10),
+                      if (dosageLabel != null ||
+                          quantityPerIntakeLabel != null) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FFFE),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: _softPrimary.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              if (dosageLabel != null)
+                                _detailChip('Dosis', dosageLabel),
+                              if (quantityPerIntakeLabel != null)
+                                _detailChip('Cantidad', quantityPerIntakeLabel),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       useStackedButtons
                           ? Column(
                               children: [
@@ -224,6 +273,24 @@ class _InAppIntakeNotificationHostState
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _detailChip(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE0F7F4),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        '$label: $value',
+        style: const TextStyle(
+          color: Color(0xFF00796B),
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

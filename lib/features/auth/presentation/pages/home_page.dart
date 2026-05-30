@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   final _authService = AuthService();
 
   late final Future<AuthUser?> _user = _authService.getAuthenticatedUser();
+  int _selectedDestination = 0;
   bool _isLoggingOut = false;
 
   @override
@@ -100,66 +101,183 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _openDestination(int index) async {
+    final routes = [
+      MedicineReminderApp.medicationsRoute,
+      MedicineReminderApp.todayIntakesRoute,
+      MedicineReminderApp.chatRoute,
+    ];
+
+    setState(() => _selectedDestination = index);
+    await Navigator.of(context).pushNamed(routes[index]);
+
+    if (mounted) {
+      setState(() => _selectedDestination = 0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom + 40;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF4FAFA),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        toolbarHeight: 74,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 1,
+        toolbarHeight: 70,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1A1A2E),
+        elevation: 0,
+        scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        shadowColor: AppColors.border.withValues(alpha: 0.1),
-        titleSpacing: 20,
+        shadowColor: Colors.transparent,
+        titleSpacing: 16,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(0.5),
+          child: SizedBox(
+            height: 0.5,
+            child: ColoredBox(color: Color(0xFFE5E7EB)),
+          ),
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Medora',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                height: 1.05,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 6,
+                  height: 6,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF00BFA5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Medora',
+                  style: TextStyle(
+                    color: Color(0xFF1A1A2E),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                    height: 1.05,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 4),
+            SizedBox(height: 2),
             Text(
               'Tu salud organizada',
               style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+                color: Color(0xFF9CA3AF),
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.1,
                 height: 1.1,
               ),
             ),
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Cerrar sesion',
-            onPressed: _isLoggingOut ? null : _confirmLogout,
-            icon: _isLoggingOut
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.primary,
-                    ),
-                  )
-                : const Icon(
-                    Icons.logout_outlined,
-                    color: AppColors.textSecondary,
-                  ),
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFE5E7EB), width: 0.5),
+            ),
+            child: IconButton(
+              tooltip: 'Cerrar sesión',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 20, height: 20),
+              onPressed: _isLoggingOut ? null : _confirmLogout,
+              iconSize: 20,
+              icon: _isLoggingOut
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : const Icon(Icons.logout_rounded, color: Color(0xFF9CA3AF)),
+            ),
           ),
-          const SizedBox(width: 8),
         ],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            indicatorColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color(0xFFB2F0E8);
+              }
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.focused)) {
+                return const Color(0xFFE0F7F4);
+              }
+              return Colors.transparent;
+            }),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              return TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              );
+            }),
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              return const IconThemeData(
+                color: AppColors.textSecondary,
+                size: 22,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            selectedIndex: _selectedDestination,
+            height: 72,
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: _openDestination,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.medication_outlined),
+                selectedIcon: Icon(Icons.medication_outlined),
+                label: 'Medicamentos',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.today_outlined),
+                selectedIcon: Icon(Icons.today_outlined),
+                label: 'Tomas de hoy',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.chat_bubble_outline),
+                selectedIcon: Icon(Icons.chat_bubble_outline),
+                label: 'Asistente',
+              ),
+            ],
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -172,10 +290,10 @@ class _HomePageState extends State<HomePage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(22, 34, 22, bottomPadding),
+                  padding: const EdgeInsets.fromLTRB(22, 34, 22, 32),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 34 - bottomPadding,
+                      minHeight: constraints.maxHeight - 66,
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -187,22 +305,18 @@ class _HomePageState extends State<HomePage> {
                             final name = user?.displayName;
 
                             return Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 28,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
                               ),
+                              width: double.infinity,
                               decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: AppColors.border,
-                                  width: 1.0,
-                                ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
-                                    blurRadius: 12,
+                                    color: Colors.black.withOpacity(0.06),
+                                    blurRadius: 20,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -211,203 +325,103 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    width: 78,
-                                    height: 78,
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          AppColors.primary,
-                                          Color(0xFF5EEAD4),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(26),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.primary.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 16,
-                                          offset: const Offset(0, 6),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.medication_liquid_outlined,
-                                      color: AppColors.surface,
-                                      size: 40,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 22),
-                                  Text(
-                                    name == null || name.isEmpty
-                                        ? 'Bienvenido'
-                                        : 'Bienvenido, $name',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                          color: AppColors.textPrimary,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.18,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Ya puedes gestionar tus medicamentos',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context).textTheme.bodyLarge
-                                        ?.copyWith(
-                                          color: AppColors.textSecondary,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.45,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 22),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.background,
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: AppColors.border,
-                                        width: 1.0,
+                                    height: 3,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF00BFA5),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
                                       ),
                                     ),
-                                    child: const Row(
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(
-                                          Icons.notifications_active_outlined,
-                                          color: AppColors.primary,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            'Tu espacio de salud esta listo para usar.',
-                                            style: TextStyle(
-                                              color: AppColors.textPrimary,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.35,
+                                        Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF00BFA5),
+                                                Color(0xFF00897B),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              18,
                                             ),
                                           ),
+                                          child: const Icon(
+                                            Icons.medication_liquid_outlined,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          name == null || name.isEmpty
+                                              ? 'Bienvenido'
+                                              : 'Bienvenido, $name',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Color(0xFF1A1A2E),
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Ya puedes gestionar tus medicamentos y recordatorios',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Color(0xFF6B7280),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 22),
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF0FBF9),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: const Row(
+                                            children: [
+                                              Icon(
+                                                Icons
+                                                    .notifications_active_outlined,
+                                                color: Color(0xFF00BFA5),
+                                                size: 18,
+                                              ),
+                                              SizedBox(width: 12),
+                                              Expanded(
+                                                child: Text(
+                                                  'Tu espacio de salud esta listo para acompanar tus rutinas diarias.',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF374151),
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.35,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 18),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: FilledButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.medicationsRoute,
-                                        );
-                                      },
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                        foregroundColor: AppColors.surface,
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.medication_outlined,
-                                      ),
-                                      label: const Text(
-                                        'Mis medicamentos',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.todayIntakesRoute,
-                                        );
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.textPrimary,
-                                        side: const BorderSide(
-                                          color: AppColors.border,
-                                          width: 1.5,
-                                        ),
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.notifications_active_outlined,
-                                      ),
-                                      label: const Text(
-                                        'Tomas de hoy',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.chatRoute,
-                                        );
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.textPrimary,
-                                        side: const BorderSide(
-                                          color: AppColors.border,
-                                          width: 1.5,
-                                        ),
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.chat_bubble_outline,
-                                      ),
-                                      label: const Text(
-                                        'Asistente Virtual',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],
