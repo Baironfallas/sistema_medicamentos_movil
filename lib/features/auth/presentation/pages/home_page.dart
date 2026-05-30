@@ -122,71 +122,113 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFF4FAFA),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        toolbarHeight: 74,
+        toolbarHeight: 70,
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF1A1A2E),
         elevation: 0,
+        scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        titleSpacing: 20,
+        titleSpacing: 16,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(0.5),
           child: SizedBox(
             height: 0.5,
-            child: ColoredBox(color: Color(0xFFE0E0E0)),
+            child: ColoredBox(color: Color(0xFFE5E7EB)),
           ),
         ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Medora',
-              style: TextStyle(
-                color: Color(0xFF1A1A2E),
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                height: 1.05,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 6,
+                  height: 6,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF00BFA5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Medora',
+                  style: TextStyle(
+                    color: Color(0xFF1A1A2E),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                    height: 1.05,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 4),
+            SizedBox(height: 2),
             Text(
               'Tu salud organizada',
               style: TextStyle(
-                color: Color(0xFF6B7280),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+                color: Color(0xFF9CA3AF),
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.1,
                 height: 1.1,
               ),
             ),
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Cerrar sesion',
-            onPressed: _isLoggingOut ? null : _confirmLogout,
-            icon: _isLoggingOut
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.primary,
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: const Color(0xFFE5E7EB),
+                width: 0.5,
+              ),
+            ),
+            child: IconButton(
+              tooltip: 'Cerrar sesión',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(
+                width: 20,
+                height: 20,
+              ),
+              onPressed: _isLoggingOut ? null : _confirmLogout,
+              iconSize: 20,
+              icon: _isLoggingOut
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.logout_rounded,
+                      color: Color(0xFF9CA3AF),
                     ),
-                  )
-                : const Icon(Icons.logout_outlined, color: Color(0xFF9CA3AF)),
+            ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFE5E7EB), width: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, -3),
             ),
           ],
         ),
@@ -194,24 +236,28 @@ class _HomePageState extends State<HomePage> {
           data: NavigationBarThemeData(
             backgroundColor: Colors.white,
             elevation: 0,
-            indicatorColor: const Color(0xFF00BFA5).withOpacity(0.14),
+            indicatorColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return const Color(0xFFB2F0E8);
+              }
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.focused)) {
+                return const Color(0xFFE0F7F4);
+              }
+              return Colors.transparent;
+            }),
             labelTextStyle: WidgetStateProperty.resolveWith((states) {
-              final isSelected = states.contains(WidgetState.selected);
               return TextStyle(
-                color: isSelected
-                    ? const Color(0xFF00BFA5)
-                    : const Color(0xFF9CA3AF),
+                color: const Color(0xFFB0BEC5),
                 fontSize: 11,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
               );
             }),
             iconTheme: WidgetStateProperty.resolveWith((states) {
-              final isSelected = states.contains(WidgetState.selected);
               return IconThemeData(
-                color: isSelected
-                    ? const Color(0xFF00BFA5)
-                    : const Color(0xFF9CA3AF),
-                size: 24,
+                color: const Color(0xFFB0BEC5),
+                size: 22,
               );
             }),
           ),
@@ -225,17 +271,17 @@ class _HomePageState extends State<HomePage> {
             destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.medication_outlined),
-                selectedIcon: Icon(Icons.medication),
+                selectedIcon: Icon(Icons.medication_outlined),
                 label: 'Medicamentos',
               ),
               NavigationDestination(
                 icon: Icon(Icons.today_outlined),
-                selectedIcon: Icon(Icons.notifications_active),
+                selectedIcon: Icon(Icons.today_outlined),
                 label: 'Tomas de hoy',
               ),
               NavigationDestination(
                 icon: Icon(Icons.chat_bubble_outline),
-                selectedIcon: Icon(Icons.smart_toy_outlined),
+                selectedIcon: Icon(Icons.chat_bubble_outline),
                 label: 'Asistente',
               ),
             ],
