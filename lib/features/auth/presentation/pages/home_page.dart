@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   final _authService = AuthService();
 
   late final Future<AuthUser?> _user = _authService.getAuthenticatedUser();
+  int _selectedDestination = 0;
   bool _isLoggingOut = false;
 
   @override
@@ -100,10 +101,23 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _openDestination(int index) async {
+    final routes = [
+      MedicineReminderApp.medicationsRoute,
+      MedicineReminderApp.todayIntakesRoute,
+      MedicineReminderApp.chatRoute,
+    ];
+
+    setState(() => _selectedDestination = index);
+    await Navigator.of(context).pushNamed(routes[index]);
+
+    if (mounted) {
+      setState(() => _selectedDestination = 0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom + 40;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -161,6 +175,73 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(width: 8),
         ],
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border(
+            top: BorderSide(
+              color: AppColors.border.withValues(alpha: 0.8),
+              width: 1,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 18,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: AppColors.surface,
+            elevation: 0,
+            indicatorColor: AppColors.primary.withValues(alpha: 0.14),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              final isSelected = states.contains(WidgetState.selected);
+              return TextStyle(
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              );
+            }),
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              final isSelected = states.contains(WidgetState.selected);
+              return IconThemeData(
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                size: 24,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            selectedIndex: _selectedDestination,
+            height: 72,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: _openDestination,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.medication_outlined),
+                selectedIcon: Icon(Icons.medication),
+                label: 'Medicamentos',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.today_outlined),
+                selectedIcon: Icon(Icons.notifications_active),
+                label: 'Tomas de hoy',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.chat_bubble_outline),
+                selectedIcon: Icon(Icons.smart_toy_outlined),
+                label: 'Asistente',
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           Container(
@@ -172,10 +253,10 @@ class _HomePageState extends State<HomePage> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(22, 34, 22, bottomPadding),
+                  padding: const EdgeInsets.fromLTRB(22, 34, 22, 32),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 34 - bottomPadding,
+                      minHeight: constraints.maxHeight - 66,
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -256,7 +337,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    'Ya puedes gestionar tus medicamentos',
+                                    'Ya puedes gestionar tus medicamentos y recordatorios',
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context).textTheme.bodyLarge
                                         ?.copyWith(
@@ -290,7 +371,7 @@ class _HomePageState extends State<HomePage> {
                                         SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            'Tu espacio de salud esta listo para usar.',
+                                            'Tu espacio de salud esta listo para acompanar tus rutinas diarias.',
                                             style: TextStyle(
                                               color: AppColors.textPrimary,
                                               fontSize: 14,
@@ -300,114 +381,6 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 18),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: FilledButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.medicationsRoute,
-                                        );
-                                      },
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                        foregroundColor: AppColors.surface,
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.medication_outlined,
-                                      ),
-                                      label: const Text(
-                                        'Mis medicamentos',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.todayIntakesRoute,
-                                        );
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.textPrimary,
-                                        side: const BorderSide(
-                                          color: AppColors.border,
-                                          width: 1.5,
-                                        ),
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.notifications_active_outlined,
-                                      ),
-                                      label: const Text(
-                                        'Tomas de hoy',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          MedicineReminderApp.chatRoute,
-                                        );
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: AppColors.textPrimary,
-                                        side: const BorderSide(
-                                          color: AppColors.border,
-                                          width: 1.5,
-                                        ),
-                                        minimumSize: const Size(
-                                          double.infinity,
-                                          56,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.chat_bubble_outline,
-                                      ),
-                                      label: const Text(
-                                        'Asistente Virtual',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],
