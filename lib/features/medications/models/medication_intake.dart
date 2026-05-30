@@ -13,6 +13,7 @@ class MedicationIntake {
     this.respondedAt,
     this.quantityTaken,
     this.remainingPills,
+    this.quantityPerIntake,
     this.dosage,
   });
 
@@ -27,6 +28,7 @@ class MedicationIntake {
   final String? respondedAt;
   final int? quantityTaken;
   final int? remainingPills;
+  final int? quantityPerIntake;
   final String? dosage;
 
   DateTime? get scheduledDateTime =>
@@ -93,6 +95,10 @@ class MedicationIntake {
         _string(medicationMap['dosage']) ??
         _string(medicationMap['dose']);
 
+    final quantityPerIntake =
+      _toIntNullable(json['quantityPerIntake']) ??
+      _toIntNullable(medicationMap['quantityPerIntake']);
+
     return MedicationIntake(
       id: id,
       medicationId: _toIntNullable(
@@ -111,6 +117,7 @@ class MedicationIntake {
       respondedAt: respondedAt,
       quantityTaken: _toIntNullable(json['quantityTaken']),
       remainingPills: _toIntNullable(json['remainingPills']),
+      quantityPerIntake: quantityPerIntake,
       dosage: dosage,
     );
   }
@@ -126,6 +133,7 @@ class MedicationIntake {
     String? respondedAt,
     int? quantityTaken,
     int? remainingPills,
+    int? quantityPerIntake,
     String? dosage,
   }) {
     return MedicationIntake(
@@ -140,6 +148,7 @@ class MedicationIntake {
       respondedAt: respondedAt ?? this.respondedAt,
       quantityTaken: quantityTaken ?? this.quantityTaken,
       remainingPills: remainingPills ?? this.remainingPills,
+      quantityPerIntake: quantityPerIntake ?? this.quantityPerIntake,
       dosage: dosage ?? this.dosage,
     );
   }

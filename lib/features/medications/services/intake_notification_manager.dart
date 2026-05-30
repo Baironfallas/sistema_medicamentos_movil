@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/services/local_notification_service.dart';
 import '../data/medication_service.dart';
+import '../models/medication.dart';
 import '../models/medication_intake.dart';
 
 enum NotificationDeliveryMode { system, inApp }
@@ -99,7 +100,9 @@ class IntakeNotificationManager extends ChangeNotifier {
 
   Future<void> refreshScheduledNotifications() async {
     try {
-      final todayIntakes = await _medicationService.getTodayIntakes();
+      final todayIntakes = await _enrichIntakesWithMedicationDetails(
+        await _medicationService.getTodayIntakes(),
+      );
       final now = DateTime.now();
       final intakesChanged = _setTodayIntakes(todayIntakes, error: null);
       final dueChanged = _updateDuePendingIntakes(todayIntakes, now);
@@ -132,6 +135,52 @@ class IntakeNotificationManager extends ChangeNotifier {
         '[IntakeNotificationManager] Error sincronizando notificaciones: $error',
       );
     }
+  }
+
+  Future<List<MedicationIntake>> _enrichIntakesWithMedicationDetails(
+    List<MedicationIntake> intakes,
+  ) async {
+    final needsEnrichment = intakes.any(
+      (intake) =>
+          intake.dosage == null ||
+          intake.dosage!.trim().isEmpty ||
+          intake.quantityPerIntake == null,
+    );
+
+    if (!needsEnrichment) {
+      return intakes;
+    }
+
+    final medications = await _medicationService.getMedications();
+    final medicationById = <int, Medication>{
+      for (final medication in medications) medication.id: medication,
+    };
+    final medicationByName = <String, Medication>{
+      for (final medication in medications)
+        _normalizeMedicationKey(medication.name): medication,
+    };
+
+    return intakes.map((intake) {
+      final medication = intake.medicationId != null
+          ? medicationById[intake.medicationId]
+          : null;
+      final fallbackMedication = medication ??
+          medicationByName[_normalizeMedicationKey(intake.medicationName)];
+      final resolvedMedication = fallbackMedication;
+      if (resolvedMedication == null) {
+        return intake;
+      }
+
+      return intake.copyWith(
+        dosage: intake.dosage ?? resolvedMedication.dose,
+        quantityPerIntake:
+            intake.quantityPerIntake ?? resolvedMedication.quantityPerIntake.toInt(),
+      );
+    }).toList();
+  }
+
+  String _normalizeMedicationKey(String value) {
+    return value.trim().toLowerCase();
   }
 
   Future<bool> updateIntakeStatus(MedicationIntake intake, String status) async {
@@ -384,6 +433,10 @@ class IntakeNotificationManager extends ChangeNotifier {
         scheduledAt: notificationTime,
         scheduledTime: timeLabel,
         dosage: intake.dosage,
+        dateLabel: intake.dateLabel,
+        quantityTaken: intake.quantityTaken,
+        remainingPills: intake.remainingPills,
+        quantityPerIntake: intake.quantityPerIntake,
       );
 
       debugPrint(
@@ -405,6 +458,10 @@ class IntakeNotificationManager extends ChangeNotifier {
         medicationName: intake.medicationName,
         scheduledTime: timeLabel,
         dosage: intake.dosage,
+        dateLabel: intake.dateLabel,
+        quantityTaken: intake.quantityTaken,
+        remainingPills: intake.remainingPills,
+        quantityPerIntake: intake.quantityPerIntake,
       );
 
       debugPrint(

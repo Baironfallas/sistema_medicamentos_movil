@@ -98,6 +98,10 @@ class LocalNotificationService {
     required String medicationName,
     required String scheduledTime,
     String? dosage,
+    String? dateLabel,
+    int? quantityTaken,
+    int? remainingPills,
+    int? quantityPerIntake,
   }) async {
     if (!_supportsSystemNotifications || _notificationsPlugin == null) {
       return;
@@ -143,11 +147,14 @@ class LocalNotificationService {
     );
 
     final String title = 'Hora de tomar medicamento';
-    final String body =
-        '$medicationName'
-        '${dosage != null ? ' - $dosage' : ''}'
-        '\n'
-        'Programado: $scheduledTime';
+    final bodyLines = <String>[
+      medicationName,
+      if (dosage != null && dosage.trim().isNotEmpty) 'Dosis: $dosage',
+      if (quantityPerIntake != null) 'Cantidad: $quantityPerIntake',
+      if (dateLabel != null && dateLabel.trim().isNotEmpty) 'Fecha: $dateLabel',
+      'Hora: $scheduledTime',
+    ];
+    final String body = bodyLines.join('\n');
 
     await _notificationsPlugin!.show(
       id,
@@ -164,6 +171,10 @@ class LocalNotificationService {
     required DateTime scheduledAt,
     required String scheduledTime,
     String? dosage,
+    String? dateLabel,
+    int? quantityTaken,
+    int? remainingPills,
+    int? quantityPerIntake,
   }) async {
     if (!_supportsSystemNotifications || _notificationsPlugin == null) {
       return;
@@ -214,11 +225,14 @@ class LocalNotificationService {
     );
 
     final String title = 'Hora de tomar medicamento';
-    final String body =
-        '$medicationName'
-        '${dosage != null ? ' - $dosage' : ''}'
-        '\n'
-        'Programado: $scheduledTime';
+    final bodyLines = <String>[
+      medicationName,
+      if (dosage != null && dosage.trim().isNotEmpty) 'Dosis: $dosage',
+      if (quantityPerIntake != null) 'Cantidad: $quantityPerIntake',
+      if (dateLabel != null && dateLabel.trim().isNotEmpty) 'Fecha: $dateLabel',
+      'Hora: $scheduledTime',
+    ];
+    final String body = bodyLines.join('\n');
 
     await _notificationsPlugin!.zonedSchedule(
       id,
