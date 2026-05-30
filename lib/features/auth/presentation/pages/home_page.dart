@@ -119,16 +119,23 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF4FAFA),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         toolbarHeight: 74,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 1,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1A1A2E),
+        elevation: 0,
         surfaceTintColor: Colors.transparent,
-        shadowColor: AppColors.border.withValues(alpha: 0.1),
+        shadowColor: Colors.transparent,
         titleSpacing: 20,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(0.5),
+          child: SizedBox(
+            height: 0.5,
+            child: ColoredBox(color: Color(0xFFE0E0E0)),
+          ),
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -136,9 +143,9 @@ class _HomePageState extends State<HomePage> {
             Text(
               'Medora',
               style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A1A2E),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
                 height: 1.05,
               ),
             ),
@@ -146,7 +153,7 @@ class _HomePageState extends State<HomePage> {
             Text(
               'Tu salud organizada',
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: Color(0xFF6B7280),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 height: 1.1,
@@ -169,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                   )
                 : const Icon(
                     Icons.logout_outlined,
-                    color: AppColors.textSecondary,
+                    color: Color(0xFF9CA3AF),
                   ),
           ),
           const SizedBox(width: 8),
@@ -177,42 +184,36 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border(
-            top: BorderSide(
-              color: AppColors.border.withValues(alpha: 0.8),
-              width: 1,
-            ),
-          ),
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 18,
-              offset: const Offset(0, -6),
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
           ],
         ),
         child: NavigationBarTheme(
           data: NavigationBarThemeData(
-            backgroundColor: AppColors.surface,
+            backgroundColor: Colors.white,
             elevation: 0,
-            indicatorColor: AppColors.primary.withValues(alpha: 0.14),
+            indicatorColor: const Color(0xFF00BFA5).withOpacity(0.14),
             labelTextStyle: WidgetStateProperty.resolveWith((states) {
               final isSelected = states.contains(WidgetState.selected);
               return TextStyle(
                 color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    ? const Color(0xFF00BFA5)
+                    : const Color(0xFF9CA3AF),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
               );
             }),
             iconTheme: WidgetStateProperty.resolveWith((states) {
               final isSelected = states.contains(WidgetState.selected);
               return IconThemeData(
                 color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
+                    ? const Color(0xFF00BFA5)
+                    : const Color(0xFF9CA3AF),
                 size: 24,
               );
             }),
@@ -220,6 +221,8 @@ class _HomePageState extends State<HomePage> {
           child: NavigationBar(
             selectedIndex: _selectedDestination,
             height: 72,
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
             onDestinationSelected: _openDestination,
             destinations: const [
@@ -268,22 +271,18 @@ class _HomePageState extends State<HomePage> {
                             final name = user?.displayName;
 
                             return Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 28,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
                               ),
+                              width: double.infinity,
                               decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: AppColors.border,
-                                  width: 1.0,
-                                ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
-                                    blurRadius: 12,
+                                    color: Colors.black.withOpacity(0.06),
+                                    blurRadius: 20,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -292,92 +291,97 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    width: 78,
-                                    height: 78,
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          AppColors.primary,
-                                          Color(0xFF5EEAD4),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(26),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.primary.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 16,
-                                          offset: const Offset(0, 6),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.medication_liquid_outlined,
-                                      color: AppColors.surface,
-                                      size: 40,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 22),
-                                  Text(
-                                    name == null || name.isEmpty
-                                        ? 'Bienvenido'
-                                        : 'Bienvenido, $name',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                          color: AppColors.textPrimary,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.18,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Ya puedes gestionar tus medicamentos y recordatorios',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context).textTheme.bodyLarge
-                                        ?.copyWith(
-                                          color: AppColors.textSecondary,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.45,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 22),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.background,
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: AppColors.border,
-                                        width: 1.0,
+                                    height: 3,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF00BFA5),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
                                       ),
                                     ),
-                                    child: const Row(
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(
-                                          Icons.notifications_active_outlined,
-                                          color: AppColors.primary,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            'Tu espacio de salud esta listo para acompanar tus rutinas diarias.',
-                                            style: TextStyle(
-                                              color: AppColors.textPrimary,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.35,
+                                        Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF00BFA5),
+                                                Color(0xFF00897B),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
                                             ),
+                                            borderRadius:
+                                                BorderRadius.circular(18),
+                                          ),
+                                          child: const Icon(
+                                            Icons.medication_liquid_outlined,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          name == null || name.isEmpty
+                                              ? 'Bienvenido'
+                                              : 'Bienvenido, $name',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Color(0xFF1A1A2E),
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Ya puedes gestionar tus medicamentos y recordatorios',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Color(0xFF6B7280),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 22),
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF0FBF9),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: const Row(
+                                            children: [
+                                              Icon(
+                                                Icons.notifications_active_outlined,
+                                                color: Color(0xFF00BFA5),
+                                                size: 18,
+                                              ),
+                                              SizedBox(width: 12),
+                                              Expanded(
+                                                child: Text(
+                                                  'Tu espacio de salud esta listo para acompanar tus rutinas diarias.',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF374151),
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.35,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
