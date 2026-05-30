@@ -46,7 +46,8 @@ class AuthFormLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final isLoginHeader = headerLabel == 'Recordatorios inteligentes para tu salud';
+    final isLoginHeader =
+        headerLabel == 'Recordatorios inteligentes para tu salud';
     final bottomSafeArea = MediaQuery.of(context).viewPadding.bottom;
     final bottomPadding =
         (scrollBottomPadding ?? (visualRefresh ? 32.0 : 28.0)) + bottomSafeArea;
@@ -59,10 +60,12 @@ class AuthFormLayout extends StatelessWidget {
     final iconSize = headerIconSize ?? (visualRefresh ? 38 : 34);
     final iconContainerSize = isLoginHeader ? 80.0 : iconSize + 12;
     final baseHeaderHeight = headerHeight ?? (visualRefresh ? 110 : 64);
-    final labelPillHeight = headerLabel == null ? 0.0 : (isLoginHeader ? 28.0 : 24.0);
+    final labelPillHeight = headerLabel == null
+        ? 0.0
+        : (isLoginHeader ? 28.0 : 24.0);
     final requiredHeaderHeight = headerLabel == null
         ? baseHeaderHeight
-      : iconContainerSize + 10 + labelPillHeight + 16;
+        : iconContainerSize + 10 + labelPillHeight + 16;
     final resolvedHeaderHeight = math.max(
       baseHeaderHeight,
       requiredHeaderHeight,
@@ -194,8 +197,9 @@ class AuthFormLayout extends StatelessWidget {
                                           ),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFE0F7F4),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                           ),
                                           child: Text(
                                             headerLabel!,
