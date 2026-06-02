@@ -1,3 +1,5 @@
+import '../../../core/utils/server_date_time.dart';
+
 class ChatSession {
   const ChatSession({
     required this.id,
@@ -55,16 +57,9 @@ String? _nullableString(Object? value) {
 }
 
 String _readableDateTime(String value) {
-  final parsed = DateTime.tryParse(value);
-  if (parsed == null) {
-    return value;
+  final formatted = formatServerDateTime(value);
+  if (formatted != null) {
+    return formatted;
   }
-
-  final local = parsed.toLocal();
-  final day = local.day.toString().padLeft(2, '0');
-  final month = local.month.toString().padLeft(2, '0');
-  final year = local.year.toString().padLeft(4, '0');
-  final hour = local.hour.toString().padLeft(2, '0');
-  final minute = local.minute.toString().padLeft(2, '0');
-  return '$day/$month/$year $hour:$minute';
+  return value;
 }

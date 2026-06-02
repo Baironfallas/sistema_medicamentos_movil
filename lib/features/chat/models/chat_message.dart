@@ -1,3 +1,5 @@
+import '../../../core/utils/server_date_time.dart';
+
 enum ChatMessageSender {
   user,
   assistant,
@@ -41,16 +43,13 @@ class ChatMessage {
   bool get isAssistant => sender == ChatMessageSender.assistant;
 
   String get timeLabel {
-    final parsed = DateTime.tryParse(sentAt);
-    if (parsed == null) {
-      final match = RegExp(r'\d{2}:\d{2}').firstMatch(sentAt);
-      return match?.group(0) ?? '';
+    final formatted = formatServerTime(sentAt);
+    if (formatted != null) {
+      return formatted;
     }
 
-    final local = parsed.toLocal();
-    final hour = local.hour.toString().padLeft(2, '0');
-    final minute = local.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    final match = RegExp(r'\d{2}:\d{2}').firstMatch(sentAt);
+    return match?.group(0) ?? '';
   }
 }
 

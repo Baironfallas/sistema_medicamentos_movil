@@ -40,6 +40,20 @@ String? formatServerTime(String? value) {
   return '$hour:$minute';
 }
 
+String? formatServerDateTime(String? value) {
+  final dateTime = parseServerDateTime(value);
+  if (dateTime == null) {
+    return null;
+  }
+
+  final day = dateTime.day.toString().padLeft(2, '0');
+  final month = dateTime.month.toString().padLeft(2, '0');
+  final year = dateTime.year.toString().padLeft(4, '0');
+  final hour = dateTime.hour.toString().padLeft(2, '0');
+  final minute = dateTime.minute.toString().padLeft(2, '0');
+  return '$day/$month/$year $hour:$minute';
+}
+
 String? formatServerDate(String? value) {
   final dateTime = parseServerDateTime(value);
   if (dateTime == null) {
