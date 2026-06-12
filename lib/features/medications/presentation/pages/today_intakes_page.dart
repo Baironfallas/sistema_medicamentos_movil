@@ -191,8 +191,8 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
               ),
               gradient: LinearGradient(
                 colors: [
-                  statusColor.withValues(alpha: 0.9),
-                  statusColor.withValues(alpha: 0.35),
+                  AppColors.primary.withValues(alpha: 0.85),
+                  AppColors.aiColor.withValues(alpha: 0.7),
                 ],
               ),
             ),
