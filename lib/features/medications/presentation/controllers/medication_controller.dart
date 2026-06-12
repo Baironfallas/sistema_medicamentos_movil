@@ -4,6 +4,7 @@ import '../../data/medication_exception.dart';
 import '../../data/medication_service.dart';
 import '../../models/medication.dart';
 import '../../models/medication_intake.dart';
+import '../../services/intake_enrichment.dart';
 import '../../services/intake_notification_manager.dart';
 
 class MedicationController extends ChangeNotifier {
@@ -45,7 +46,9 @@ class MedicationController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      todayIntakes = await _service.getTodayIntakes();
+      todayIntakes = await _enrichIntakesWithMedicationDetails(
+        await _service.getTodayIntakes(),
+      );
     } catch (error) {
       intakesError = _errorMessage(error);
     } finally {
@@ -136,6 +139,27 @@ class MedicationController extends ChangeNotifier {
       isConfirming = false;
       notifyListeners();
     }
+  }
+
+  Future<List<MedicationIntake>> _enrichIntakesWithMedicationDetails(
+    List<MedicationIntake> intakes,
+  ) async {
+    final needsEnrichment = intakes.any(
+      (intake) =>
+          intake.dosage == null ||
+          intake.dosage!.trim().isEmpty ||
+          intake.quantityPerIntake == null,
+    );
+
+    if (!needsEnrichment) {
+      return intakes;
+    }
+
+    final sourceMedications = medications.isEmpty
+        ? await _service.getMedications()
+        : medications;
+
+    return enrichIntakesWithMedicationDetails(intakes, sourceMedications);
   }
 
   String _errorMessage(Object error) {

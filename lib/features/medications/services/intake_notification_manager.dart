@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/services/local_notification_service.dart';
 import '../data/medication_service.dart';
-import '../models/medication.dart';
 import '../models/medication_intake.dart';
+import 'intake_enrichment.dart';
 
 enum NotificationDeliveryMode { system, inApp }
 
@@ -103,7 +103,7 @@ class IntakeNotificationManager extends ChangeNotifier {
       final todayIntakes = await _enrichIntakesWithMedicationDetails(
         await _medicationService.getTodayIntakes(),
       );
-      final now = DateTime.now();
+      final now = _currentComparisonDateTime();
       final intakesChanged = _setTodayIntakes(todayIntakes, error: null);
       final dueChanged = _updateDuePendingIntakes(todayIntakes, now);
       _scheduleNextDueRefresh(todayIntakes, now);
@@ -151,37 +151,7 @@ class IntakeNotificationManager extends ChangeNotifier {
     }
 
     final medications = await _medicationService.getMedications();
-    final medicationById = <int, Medication>{
-      for (final medication in medications) medication.id: medication,
-    };
-    final medicationByName = <String, Medication>{
-      for (final medication in medications)
-        _normalizeMedicationKey(medication.name): medication,
-    };
-
-    return intakes.map((intake) {
-      final medication = intake.medicationId != null
-          ? medicationById[intake.medicationId]
-          : null;
-      final fallbackMedication =
-          medication ??
-          medicationByName[_normalizeMedicationKey(intake.medicationName)];
-      final resolvedMedication = fallbackMedication;
-      if (resolvedMedication == null) {
-        return intake;
-      }
-
-      return intake.copyWith(
-        dosage: intake.dosage ?? resolvedMedication.dose,
-        quantityPerIntake:
-            intake.quantityPerIntake ??
-            resolvedMedication.quantityPerIntake.toInt(),
-      );
-    }).toList();
-  }
-
-  String _normalizeMedicationKey(String value) {
-    return value.trim().toLowerCase();
+    return enrichIntakesWithMedicationDetails(intakes, medications);
   }
 
   Future<bool> updateIntakeStatus(
@@ -372,7 +342,7 @@ class IntakeNotificationManager extends ChangeNotifier {
       return;
     }
 
-    final delay = nextDueTime.difference(DateTime.now());
+    final delay = nextDueTime.difference(now);
     _nextDueTimer = Timer(
       (delay.isNegative ? Duration.zero : delay) +
           const Duration(milliseconds: 200),
@@ -491,6 +461,27 @@ class IntakeNotificationManager extends ChangeNotifier {
       );
     }
     return scheduledDateTime;
+  }
+
+  DateTime _currentComparisonDateTime() {
+    if (!usesInAppAlerts) {
+      return DateTime.now();
+    }
+
+    final costaRicaNow = DateTime.now().toUtc().subtract(
+      const Duration(hours: 6),
+    );
+
+    return DateTime(
+      costaRicaNow.year,
+      costaRicaNow.month,
+      costaRicaNow.day,
+      costaRicaNow.hour,
+      costaRicaNow.minute,
+      costaRicaNow.second,
+      costaRicaNow.millisecond,
+      costaRicaNow.microsecond,
+    );
   }
 
   void clearNotifiedIntakes() {

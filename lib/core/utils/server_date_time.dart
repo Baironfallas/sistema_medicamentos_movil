@@ -13,19 +13,6 @@ DateTime? parseServerDateTime(String? value) {
     return parsed.toLocal();
   }
 
-  if (_hasTimeComponent(text)) {
-    return DateTime.utc(
-      parsed.year,
-      parsed.month,
-      parsed.day,
-      parsed.hour,
-      parsed.minute,
-      parsed.second,
-      parsed.millisecond,
-      parsed.microsecond,
-    ).toLocal();
-  }
-
   return parsed;
 }
 
@@ -68,8 +55,4 @@ String? formatServerDate(String? value) {
 
 bool _hasExplicitTimeZone(String value) {
   return RegExp(r'(Z|z|[+-]\d{2}:?\d{2})$').hasMatch(value);
-}
-
-bool _hasTimeComponent(String value) {
-  return RegExp(r'^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}').hasMatch(value);
 }

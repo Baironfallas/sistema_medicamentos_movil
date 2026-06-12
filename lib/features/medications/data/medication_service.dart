@@ -207,7 +207,7 @@ class MedicationService {
   }
 
   Future<Map<String, String>> _authHeaders() async {
-    final token = await _storage.getAccessToken();
+    final token = await _authService.getValidAccessToken();
 
     if (token == null || token.isEmpty) {
       throw const MedicationException('Sesion no valida. Inicia sesion.');

@@ -225,6 +225,24 @@ class AuthService {
     return _storage.getAccessToken();
   }
 
+  Future<String?> getValidAccessToken() async {
+    final accessToken = await _storage.getAccessToken();
+    if (accessToken == null || accessToken.isEmpty) {
+      return null;
+    }
+
+    if (!_shouldRefreshAccessToken(accessToken)) {
+      return accessToken;
+    }
+
+    final refreshed = await refreshSession();
+    if (!refreshed) {
+      return null;
+    }
+
+    return _storage.getAccessToken();
+  }
+
   Future<String?> getRefreshToken() {
     return _storage.getRefreshToken();
   }
@@ -297,6 +315,44 @@ class AuthService {
       throw const AuthException(
         'Ocurrió un error inesperado. Inténtalo nuevamente.',
       );
+    }
+  }
+
+  bool _shouldRefreshAccessToken(String accessToken) {
+    final expiresAt = _jwtExpiration(accessToken);
+    if (expiresAt == null) {
+      return false;
+    }
+
+    return DateTime.now().isAfter(
+      expiresAt.subtract(const Duration(seconds: 30)),
+    );
+  }
+
+  DateTime? _jwtExpiration(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      return null;
+    }
+
+    try {
+      final payload = utf8.decode(
+        base64Url.decode(base64Url.normalize(parts[1])),
+      );
+      final decoded = jsonDecode(payload);
+      if (decoded is! Map) {
+        return null;
+      }
+
+      final rawExp = decoded['exp'];
+      final exp = rawExp is num ? rawExp.toInt() : int.tryParse('$rawExp');
+      if (exp == null) {
+        return null;
+      }
+
+      return DateTime.fromMillisecondsSinceEpoch(exp * 1000);
+    } on FormatException {
+      return null;
     }
   }
 
