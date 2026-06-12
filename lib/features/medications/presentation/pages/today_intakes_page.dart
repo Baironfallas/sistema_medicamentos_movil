@@ -149,7 +149,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
     }
 
     final scheduledText = intake.dateLabel != null
-        ? '${intake.timeLabel ?? 'Horario pendiente'} · ${intake.dateLabel}'
+        ? '${intake.timeLabel ?? 'Horario pendiente'} | ${intake.dateLabel}'
         : (intake.timeLabel ?? 'Horario pendiente');
 
     final respondedTime = intake.respondedTimeLabel;
@@ -158,7 +158,8 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
         ? null
         : (respondedDate == null
               ? respondedTime
-              : '$respondedTime · $respondedDate');
+              : '$respondedTime | $respondedDate');
+    final quantityLabel = intake.quantityPerIntake ?? intake.quantityTaken ?? 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -274,7 +275,7 @@ class _TodayIntakesPageState extends State<TodayIntakesPage> {
                     statPill(
                       icon: Icons.medication_liquid_outlined,
                       label: 'Cantidad',
-                      value: '${intake.quantityTaken ?? 0}',
+                      value: '$quantityLabel',
                     ),
                     statPill(
                       icon: Icons.inventory_2_outlined,

@@ -1,5 +1,3 @@
-import '../../../core/utils/server_date_time.dart';
-
 class MedicationIntake {
   MedicationIntake({
     required this.id,
@@ -32,11 +30,11 @@ class MedicationIntake {
   final String? dosage;
 
   DateTime? get scheduledDateTime =>
-      parseServerDateTime(scheduledAt) ??
-      _dateTimeFromLabels(dateLabel, timeLabel);
+      _dateTimeFromLabels(dateLabel, timeLabel) ??
+      _parseMedicationDateTime(scheduledAt);
 
-  String? get respondedTimeLabel => formatServerTime(respondedAt);
-  String? get respondedDateLabel => formatServerDate(respondedAt);
+  String? get respondedTimeLabel => _formatMedicationTime(respondedAt);
+  String? get respondedDateLabel => _formatMedicationDate(respondedAt);
 
   factory MedicationIntake.fromJson(Map<String, dynamic> json) {
     final id = _toInt(json['intakeId'] ?? json['id']);
@@ -79,15 +77,18 @@ class MedicationIntake {
     final hour =
         _string(json['hour']) ??
         _string(json['scheduledHour']) ??
-        _string(json['hourLabel']);
+        _string(json['hourLabel']) ??
+        _timeOnlyLabel(json['time']) ??
+        _timeOnlyLabel(json['scheduledTime']) ??
+        _timeOnlyLabel(json['intakeTime']);
 
     final date =
         _string(json['date']) ??
         _string(json['scheduledDate']) ??
         _string(json['day']);
 
-    final timeLabel = formatServerTime(scheduledAt) ?? hour;
-    final dateLabel = formatServerDate(scheduledAt) ?? date;
+    final timeLabel = _timeOnlyLabel(hour) ?? _formatMedicationTime(scheduledAt);
+    final dateLabel = date ?? _formatMedicationDate(scheduledAt);
 
     final dosage =
         _string(json['dosage']) ??
@@ -202,6 +203,87 @@ bool? _bool(Object? value) {
 String? _string(Object? value) {
   final text = value?.toString().trim();
   return text == null || text.isEmpty ? null : text;
+}
+
+String? _timeOnlyLabel(Object? value) {
+  final text = _string(value);
+  if (text == null) {
+    return null;
+  }
+
+  final timeMatch = RegExp(r'^(\d{1,2}):(\d{2})(?::\d{2})?$').firstMatch(
+    text,
+  );
+  if (timeMatch == null) {
+    return null;
+  }
+
+  final hour = int.tryParse(timeMatch.group(1) ?? '');
+  final minute = int.tryParse(timeMatch.group(2) ?? '');
+  if (hour == null || minute == null || hour > 23 || minute > 59) {
+    return null;
+  }
+
+  return '${hour.toString().padLeft(2, '0')}:'
+      '${minute.toString().padLeft(2, '0')}';
+}
+
+DateTime? _parseMedicationDateTime(String? value) {
+  final text = value?.trim();
+  if (text == null || text.isEmpty) {
+    return null;
+  }
+
+  final parsed = DateTime.tryParse(text);
+  if (parsed == null) {
+    return null;
+  }
+
+  if (!_hasExplicitTimeZone(text)) {
+    return parsed;
+  }
+
+  final costaRicaDateTime = parsed.toUtc().subtract(
+    const Duration(hours: 6),
+  );
+
+  return DateTime(
+    costaRicaDateTime.year,
+    costaRicaDateTime.month,
+    costaRicaDateTime.day,
+    costaRicaDateTime.hour,
+    costaRicaDateTime.minute,
+    costaRicaDateTime.second,
+    costaRicaDateTime.millisecond,
+    costaRicaDateTime.microsecond,
+  );
+}
+
+String? _formatMedicationTime(String? value) {
+  final dateTime = _parseMedicationDateTime(value);
+  if (dateTime == null) {
+    return null;
+  }
+
+  final hour = dateTime.hour.toString().padLeft(2, '0');
+  final minute = dateTime.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+String? _formatMedicationDate(String? value) {
+  final dateTime = _parseMedicationDateTime(value);
+  if (dateTime == null) {
+    return null;
+  }
+
+  final year = dateTime.year.toString().padLeft(4, '0');
+  final month = dateTime.month.toString().padLeft(2, '0');
+  final day = dateTime.day.toString().padLeft(2, '0');
+  return '$year-$month-$day';
+}
+
+bool _hasExplicitTimeZone(String value) {
+  return RegExp(r'(Z|z|[+-]\d{2}:?\d{2})$').hasMatch(value);
 }
 
 DateTime? _dateTimeFromLabels(String? dateLabel, String? timeLabel) {
